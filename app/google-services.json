@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "808535675818",
+    "project_id": "turbo-fix",
+    "storage_bucket": "turbo-fix.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:808535675818:android:62999f57500e39135111d3",
+        "android_client_info": {
+          "package_name": "com.example.turbo_fix"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7DA9V3yce-xfSt8WnyNOgihsi5v16VLI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

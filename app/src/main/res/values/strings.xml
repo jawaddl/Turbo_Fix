@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Turbo Fix</string>
+    <string name="kilometer_hint"></string>
+    <string name="treatment_level_hint">בחר רמת טיפול</string>
+    <string name="accident_hint">האם הרכב עבר תאונה?</string>
+    <string name="accident_description_hint">תיאור התאונה</string>
+    <string name="upload_image_button">העלה תמונה</string>
+    <string name="save_button">שמור נתונים</string>
+
+    <!-- מערך אופציות לתאונה -->
+    <array name="accident_options">
+        <item>כן</item>
+        <item>לא</item>
+    </array>
+
+    <!-- מערך רמות טיפול -->
+    <array name="maintenance_levels">
+        <item>החלפה</item>
+        <item>בדיקה</item>
+        <item>שדרוג</item>
+    </array>
+</resources>
