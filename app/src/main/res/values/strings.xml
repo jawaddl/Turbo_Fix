@@ -13,10 +13,11 @@
         <item>לא</item>
     </array>
 
-    <!-- מערך רמות טיפול -->
-    <array name="maintenance_levels">
-        <item>החלפה</item>
-        <item>בדיקה</item>
-        <item>שדרוג</item>
-    </array>
+    <!-- מערך רמות טיפול נוספות -->
+    <string-array name="service_level_options">
+        <item>מטפל בתדירות גבוהה</item>
+        <item>מטפל לפי הוראות יצרן</item>
+        <item>מטפל באופן חלקי/מדי פעם</item>
+    </string-array>
+
 </resources>

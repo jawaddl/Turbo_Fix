@@ -1,19 +1,14 @@
 package com.example.turbo_fix;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
+import android.graphics.Color;
+
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.view.Window;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 public class MainActivity extends AppCompatActivity {
@@ -24,11 +19,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().setStatusBarColor(Color.parseColor("#8D6E63"));
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Window window = this.getWindow();
-        window.setStatusBarColor(0xFF8D6E63);
 
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
@@ -39,27 +33,31 @@ public class MainActivity extends AppCompatActivity {
 
         loginButton.setOnClickListener(view -> loginUser());
 
-        // הגדרת מאזין לכפתור ההרשמה
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Registration.class);
-                startActivity(intent);
-                finish();
-            }
+        registerButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, Registration.class);
+            startActivity(intent);
+            finish();
         });
     }
 
     private void loginUser() {
-        String email = emailEditText.getText().toString().trim();  // הוספתי trim כדי לוודא שאין רווחים
-        String password = passwordEditText.getText().toString().trim();  // הוספתי trim כדי לוודא שאין רווחים
+        String email = emailEditText.getText().toString().trim();
+        String password = passwordEditText.getText().toString().trim();
 
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(MainActivity.this, "אנא מלא את כל השדות", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        firestore.collection("users")
+        // בדיקה אם המשתמש הוא ADMIN
+        if (email.equals("a") && password.equals("b")) {
+            Intent intent = new Intent(MainActivity.this, Admin_Activity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
+        firestore.collection("USER")
                 .whereEqualTo("email", email)
                 .whereEqualTo("password", password)
                 .get()
@@ -67,16 +65,23 @@ public class MainActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         QuerySnapshot querySnapshot = task.getResult();
                         if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                            DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
+                            String clientId = documentSnapshot.getId();
+
+                            Intent intent = new Intent(MainActivity.this, Client_Activity.class);
+                            intent.putExtra("clientId", clientId);
+                            startActivity(intent);
+                            finish();
+
                             Toast.makeText(MainActivity.this, "ההתחברות הצליחה", Toast.LENGTH_SHORT).show();
-                            // המעבר לאקטיביטי הבא
-                            //startActivity(new Intent(MainActivity.this, DashboardActivity.class));  // הוספתי את המעבר לאקטיביטי
                         } else {
                             Toast.makeText(MainActivity.this, "פרטי ההתחברות שגויים", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Log.e("LoginError", "שגיאה בביצוע השאילתה", task.getException()); // הדפסת שגיאה אם קיימת
                         Toast.makeText(MainActivity.this, "שגיאה בהתחברות", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 }
+
+

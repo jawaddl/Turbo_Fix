@@ -1,78 +1,112 @@
-<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#FFFFFF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:gravity="center">
 
         <!-- כותרת -->
         <TextView
-            android:id="@+id/titleTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="פרטי רכב"
-            android:textSize="24sp"
+            android:textColor="#8D6E63"
+            android:textSize="30sp"
             android:textStyle="bold"
-            android:layout_gravity="center" />
+            android:layout_marginBottom="16dp"/>
 
-        <!-- שדה קילומטראז' -->
-        <EditText
-            android:id="@+id/kilometerEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/kilometer_hint"
-            android:inputType="number" />
-
-        <!-- ספינר רמת טיפול ברכב -->
-        <Spinner
-            android:id="@+id/treatmentSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <!-- שדה עבר תאונות -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/accident_hint" />
-
-        <Spinner
-            android:id="@+id/accidentSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:entries="@array/accident_options" />
-
-        <!-- שדה תיאור תאונה (מוסתר בהתחלה) -->
-        <EditText
-            android:id="@+id/accidentDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/accident_description_hint"
-            android:visibility="gone" />
-
-        <!-- כפתור העלאת תמונה -->
+        <!-- העלאת תמונה -->
         <Button
-            android:id="@+id/uploadImageButton"
+            android:id="@+id/upload_image_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/upload_image_button" />
+            android:text="העלאת תמונה"
+            android:backgroundTint="#8D6E63"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="16dp"/>
 
-        <!-- תצוגת תמונה שהמשתמש מעלה -->
+        <!-- הצגת התמונה -->
         <ImageView
-            android:id="@+id/vehicleImageView"
+            android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="200dp"
+            android:layout_marginBottom="16dp"
             android:scaleType="centerCrop"
-            android:visibility="gone" />
+            android:visibility="gone"/>
 
-        <!-- כפתור שמירת הנתונים -->
-        <Button
-            android:id="@+id/saveButton"
+        <!-- קילומטראז' -->
+        <EditText
+            android:id="@+id/mileage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/save_button" />
+            android:inputType="number"
+            android:hint="קילומטראז'"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background"
+            android:gravity="start"
+            android:textColor="#121111"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- שאלה אם הרכב עבר תאונה -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="האם הרכב עבר תאונה?"
+            android:layout_marginBottom="8dp"
+            android:textSize="18sp"
+            android:textColor="#121111"/>
+
+        <Spinner
+            android:id="@+id/accident_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="66dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- שדה פרטי תאונה, יימשך רק אם נבחר "כן" בתשובה -->
+        <EditText
+            android:id="@+id/accident_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="פרטי תאונה"
+            android:visibility="gone"
+            android:padding="12dp"
+            android:background="@android:drawable/editbox_background"
+            android:gravity="start"
+            android:textColor="#121111"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- רמת טיפול -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="בחר רמת טיפול"
+            android:layout_marginBottom="8dp"
+            android:textSize="18sp"
+            android:textColor="#121111"/>
+
+        <Spinner
+            android:id="@+id/service_level_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:layout_marginBottom="16dp"
+            android:entries="@array/service_level_options" />
+
+        <!-- כפתור שלח -->
+        <Button
+            android:id="@+id/submit_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="השלם"
+            android:backgroundTint="#8D6E63"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="20dp"/>
+
     </LinearLayout>
 </ScrollView>
