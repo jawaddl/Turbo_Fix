@@ -27,13 +27,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 public class Client_Activity extends AppCompatActivity {
 
-    private TextView clientIdTextView;
-    private TextView clientNameTextView;
-    private TextView carTypeTextView;
-    private TextView kilometersTextView;
-    private TextView carModelTextView;
+    private TextView clientIdTextView, clientNameTextView, carTypeTextView, kilometersTextView, carModelTextView;
+    private TextView noAppointmentTextView;
     private Button button_tor;
-
     private FirebaseFirestore db;
     private String clientId;
 
@@ -49,21 +45,23 @@ public class Client_Activity extends AppCompatActivity {
         carModelTextView = findViewById(R.id.carModelTextView);
         kilometersTextView = findViewById(R.id.kilometersTextView);
         carTypeTextView = findViewById(R.id.carTypeTextView);
+        noAppointmentTextView = findViewById(R.id.noAppointmentTextView);
         button_tor = findViewById(R.id.button_tor);
+        ImageButton wrenchButton = findViewById(R.id.wrenchButton);
 
         db = FirebaseFirestore.getInstance();
 
         Intent intent = getIntent();
         clientId = intent.getStringExtra("clientId");
 
-        if (clientId != null) {
+        if (clientId != null && !clientId.isEmpty()) {
             clientIdTextView.setText("מזהה לקוח: " + clientId);
             fetchClientData(clientId);
+            checkAppointment(clientId);
         } else {
             Toast.makeText(this, "לא התקבל מזהה לקוח", Toast.LENGTH_SHORT).show();
         }
 
-        ImageButton wrenchButton = findViewById(R.id.wrenchButton);
         wrenchButton.setOnClickListener(v -> {
             PopupMenu popupMenu = new PopupMenu(Client_Activity.this, v);
             popupMenu.getMenu().add("עדכון קילומטראז׳");
@@ -77,7 +75,7 @@ public class Client_Activity extends AppCompatActivity {
                         showUpdateDialog("קילומטראז׳ חדש", "mileage", InputType.TYPE_CLASS_NUMBER);
                         break;
                     case "שינוי מספר טלפון":
-                        showUpdateDialog("מספר טלפון חדש", "phoneNumber", InputType.TYPE_CLASS_PHONE);
+                        showUpdateDialog("מספר טלפון חדש", "phone", InputType.TYPE_CLASS_PHONE);
                         break;
                     case "שינוי סיסמא":
                         showUpdateDialog("סיסמה חדשה", "password", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
@@ -91,38 +89,72 @@ public class Client_Activity extends AppCompatActivity {
 
         button_tor.setOnClickListener(v -> {
             Intent torIntent = new Intent(Client_Activity.this, Service_selection.class);
-            torIntent.putExtra("clientId", clientId); // העברת מזהה הלקוח למסך הבא
+            torIntent.putExtra("clientId", clientId);
             startActivity(torIntent);
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (clientId != null && !clientId.isEmpty()) {
+            checkAppointment(clientId); // ריענון נתוני תור
+        }
     }
 
     private void fetchClientData(String clientId) {
         DocumentReference clientRef = db.collection("USER").document(clientId);
 
-        clientRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    String fullName = document.getString("fullName");
-                    String vehicle = document.getString("vehicle");
-                    String mileage = document.getString("mileage");
-                    String phone = document.getString("phone");
+        clientRef.get().addOnSuccessListener(document -> {
+            if (document.exists()) {
+                String fullName = document.getString("fullName");
+                String vehicle = document.getString("vehicle");
+                String mileage = document.getString("mileage");
+                String phone = document.getString("phone");
 
-                    SpannableString nameSpan = new SpannableString("  שלום: " + fullName);
-                    nameSpan.setSpan(new StyleSpan(Typeface.BOLD), 0, nameSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    nameSpan.setSpan(new RelativeSizeSpan(1.3f), 0, nameSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    clientNameTextView.setText(nameSpan);
+                SpannableString nameSpan = new SpannableString("  שלום: " + fullName);
+                nameSpan.setSpan(new StyleSpan(Typeface.BOLD), 0, nameSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                nameSpan.setSpan(new RelativeSizeSpan(1.3f), 0, nameSpan.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                clientNameTextView.setText(nameSpan);
 
-                    setStyledText(carTypeTextView, "מספר לוחית", "           " + vehicle);
-                    setStyledText(kilometersTextView, "ק\"מ", mileage);
-                    setStyledText(carModelTextView, "    מספר בעלים", phone + "        ");
-                } else {
-                    Toast.makeText(Client_Activity.this, "הלקוח לא נמצא", Toast.LENGTH_SHORT).show();
-                }
+                setStyledText(carTypeTextView, "מספר לוחית", vehicle != null ? "  " + vehicle : "לא קיים");
+                setStyledText(kilometersTextView, "ק\"מ", mileage != null ? mileage : "לא קיים");
+                setStyledText(carModelTextView, "מספר בעלים", phone != null ? phone : "לא קיים");
             } else {
-                Toast.makeText(Client_Activity.this, "שגיאה בהבאת הנתונים", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Client_Activity.this, "הלקוח לא נמצא", Toast.LENGTH_SHORT).show();
             }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(Client_Activity.this, "שגיאה בהבאת הנתונים", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    private void checkAppointment(String clientId) {
+        db.collection("USER").document(clientId)
+                .collection("Appointments")
+                .limit(1)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        DocumentSnapshot appointment = queryDocumentSnapshots.getDocuments().get(0);
+                        String date = appointment.getString("date");
+                        String time = appointment.getString("time");
+
+                        if (date != null && time != null) {
+                            noAppointmentTextView.setText("תור נקבע ל־" + date + " בשעה " + time);
+                            noAppointmentTextView.setTextColor(Color.parseColor("#000000"));
+                        } else {
+                            noAppointmentTextView.setText("תור קיים אך חסר מידע");
+                            noAppointmentTextView.setTextColor(Color.RED);
+                        }
+                    } else {
+                        noAppointmentTextView.setText("לא קיים זימון תור");
+                        noAppointmentTextView.setTextColor(Color.BLACK);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    noAppointmentTextView.setText("שגיאה בבדיקת תור");
+                    noAppointmentTextView.setTextColor(Color.RED);
+                });
     }
 
     private void setStyledText(TextView textView, String label, String value) {
@@ -146,12 +178,6 @@ public class Client_Activity extends AppCompatActivity {
             String newValue = input.getText().toString().trim();
             if (!newValue.isEmpty()) {
                 updateFieldInFirestore(fieldKey, newValue);
-
-                if (fieldKey.equals("mileage")) {
-                    setStyledText(kilometersTextView, "ק\"מ", newValue);
-                }
-
-                Toast.makeText(this, "המידע עודכן בהצלחה", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "השדה ריק", Toast.LENGTH_SHORT).show();
             }
@@ -165,7 +191,8 @@ public class Client_Activity extends AppCompatActivity {
         DocumentReference clientRef = db.collection("USER").document(clientId);
         clientRef.update(fieldKey, newValue)
                 .addOnSuccessListener(aVoid -> {
-                    // הצלחה
+                    Toast.makeText(this, "המידע עודכן בהצלחה", Toast.LENGTH_SHORT).show();
+                    fetchClientData(clientId);
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "עדכון נכשל", Toast.LENGTH_SHORT).show();

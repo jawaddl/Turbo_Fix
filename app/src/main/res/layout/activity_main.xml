@@ -4,55 +4,229 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#FFFFFF"
+    tools:context=".LoginActivity">
 
 
+    <ImageView
+        android:id="@+id/turboIconRight"
+        android:layout_width="91dp"
+        android:layout_height="88dp"
+        android:rotation="-30"
+        android:src="@drawable/turbo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/appNameText"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.057" />
+
+    <ImageView
+        android:id="@+id/turboIconLeft"
+        android:layout_width="109dp"
+        android:layout_height="107dp"
+        android:rotation="49"
+        android:src="@drawable/turbo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/appNameText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.031" />
+
+    <TextView
+        android:id="@+id/appNameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TurboFix"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        android:textColor="#8D6E63"
+        android:fontFamily="sans-serif-medium"
+        android:layout_marginTop="60dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- כותרת ברוך הבא -->
     <TextView
         android:id="@+id/titleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ברוך הבא!"
-        android:textSize="30sp"
-        android:textColor="#6D4C41"
+        android:layout_marginTop="32dp"
         android:fontFamily="sans-serif"
-        android:layout_marginTop="100dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:text="ברוך הבא!"
+        android:textColor="#6D4C41"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/appNameText" />
+
+    <!-- אייקונים של חלקי רכב -->
+    <LinearLayout
+        android:id="@+id/car_parts_section"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="50dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleText">
+
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="Piston"
+                android:src="@drawable/piston" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Piston"
+                android:textColor="#6D4C41"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Piston -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="Bodycar"
+                android:src="@drawable/bodycar" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bodycar"
+                android:textColor="#6D4C41"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!-- Engine -->
+
+        <!-- Oil -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="Oil"
+                android:src="@drawable/oil" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Oil"
+                android:textColor="#6D4C41"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="Engine"
+                android:src="@drawable/engine" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Engine"
+                android:textColor="#6D4C41"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Spark Plugs -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="Spark Plugs"
+                android:src="@drawable/wheel" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wheels"
+                android:textColor="#6D4C41"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- אימייל -->
+
+    <!-- סיסמה -->
 
     <EditText
         android:id="@+id/emailEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="48dp"
+        android:background="@drawable/edittext_bg"
         android:hint="אימייל"
-        android:textColorHint="@color/black"
         android:inputType="textEmailAddress"
         android:padding="16dp"
         android:textColor="#6D4C41"
-        android:background="@drawable/edittext_bg"
-        app:layout_constraintTop_toBottomOf="@id/titleText"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textColorHint="#888888"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="50dp"/>
-
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/car_parts_section" />
 
     <EditText
         android:id="@+id/passwordEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="סיסמה"
-        android:textColorHint="@color/black"
+        android:textColorHint="#888888"
         android:inputType="textPassword"
         android:padding="16dp"
         android:textColor="#6D4C41"
         android:background="@drawable/edittext_bg"
         android:gravity="right|center_vertical"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="32dp"
         app:layout_constraintTop_toBottomOf="@id/emailEditText"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
-
+    <!-- כפתור התחברות -->
     <Button
         android:id="@+id/loginButton"
         android:layout_width="0dp"
@@ -60,12 +234,13 @@
         android:text="התחבר"
         android:textColor="#FFFFFF"
         android:backgroundTint="#8D6E63"
+        android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="32dp"
         app:layout_constraintTop_toBottomOf="@id/passwordEditText"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="30dp"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
-
+    <!-- כפתור הרשמה -->
     <Button
         android:id="@+id/registerButton"
         android:layout_width="wrap_content"
@@ -73,8 +248,9 @@
         android:text="אין לך חשבון? הצטרף עכשיו"
         android:textColor="#8D6E63"
         android:backgroundTint="@android:color/transparent"
+        android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@id/loginButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp"/>
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

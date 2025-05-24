@@ -9,8 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class Service_selection extends AppCompatActivity {
 
-    Button scheduleAppointmentBtn, urgentCallBtn;
-    String clientId; // הוספתי את המשתנה clientId
+    Button scheduleAppointmentBtn, urgentCallBtn, backToClientBtn;
+    String clientId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +19,7 @@ public class Service_selection extends AppCompatActivity {
 
         scheduleAppointmentBtn = findViewById(R.id.scheduleAppointmentBtn);
         urgentCallBtn = findViewById(R.id.urgentCallBtn);
+        backToClientBtn = findViewById(R.id.backToClientBtn); // כפתור חזרה
 
         // קבלת מזהה הלקוח
         Intent intent = getIntent();
@@ -26,7 +27,7 @@ public class Service_selection extends AppCompatActivity {
 
         scheduleAppointmentBtn.setOnClickListener(v -> {
             Intent torIntent = new Intent(Service_selection.this, Make_An_appointment.class);
-            torIntent.putExtra("clientId", clientId); // העברת מזהה הלקוח למסך הבא
+            torIntent.putExtra("clientId", clientId);
             startActivity(torIntent);
         });
 
@@ -34,6 +35,13 @@ public class Service_selection extends AppCompatActivity {
             Intent intentCall = new Intent(Intent.ACTION_DIAL);
             intentCall.setData(Uri.parse("tel:0536256922"));
             startActivity(intentCall);
+        });
+
+        backToClientBtn.setOnClickListener(v -> {
+            Intent backIntent = new Intent(Service_selection.this, Client_Activity.class);
+            backIntent.putExtra("clientId", clientId); // אם אתה רוצה להעביר חזרה את המזהה
+            startActivity(backIntent);
+            finish(); // סוגר את המסך הנוכחי כדי שלא ייערם
         });
     }
 }

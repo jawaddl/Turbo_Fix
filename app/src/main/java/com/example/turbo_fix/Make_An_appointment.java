@@ -3,8 +3,11 @@ package com.example.turbo_fix;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.*;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -43,6 +46,12 @@ public class Make_An_appointment extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_make_an_appointment);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(0xFF8D6E63);
+        }
+
         clientId = getIntent().getStringExtra("clientId");
         if (clientId == null) {
             Toast.makeText(this, "אין מזהה לקוח זמין!", Toast.LENGTH_SHORT).show();
@@ -70,7 +79,9 @@ public class Make_An_appointment extends AppCompatActivity {
                 .addOnSuccessListener(document -> {
                     if (document.exists()) {
                         fullName = document.getString("fullName");
-                        welcomeTextView.setText("שלום: " + fullName);
+                        if (fullName != null) {
+                            welcomeTextView.setText("שלום: " + fullName);
+                        }
                     }
                 });
 
@@ -141,9 +152,16 @@ public class Make_An_appointment extends AppCompatActivity {
         DatePickerDialog dialog = new DatePickerDialog(this,
                 (view, year, month, dayOfMonth) -> {
                     Calendar pickedDate = Calendar.getInstance();
-                    pickedDate.set(year, month, dayOfMonth);
+                    pickedDate.set(year, month, dayOfMonth, 0, 0, 0);
+                    pickedDate.set(Calendar.MILLISECOND, 0);
 
-                    if (pickedDate.before(now) || pickedDate.after(maxDate)) {
+                    Calendar today = Calendar.getInstance();
+                    today.set(Calendar.HOUR_OF_DAY, 0);
+                    today.set(Calendar.MINUTE, 0);
+                    today.set(Calendar.SECOND, 0);
+                    today.set(Calendar.MILLISECOND, 0);
+
+                    if (pickedDate.before(today) || pickedDate.after(maxDate)) {
                         Toast.makeText(this, "ניתן לבחור תור רק לשבוע הקרוב!", Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -192,15 +210,16 @@ public class Make_An_appointment extends AppCompatActivity {
     private void addThumbnail(Uri uri) {
         ImageView imageView = new ImageView(this);
         imageView.setImageURI(uri);
-        imageView.setLayoutParams(new LinearLayout.LayoutParams(200, 200));
-        imageView.setPadding(8, 8, 8, 8);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(200, 200);
+        params.setMargins(8,8,8,8);
+        imageView.setLayoutParams(params);
         imageContainer.addView(imageView);
     }
 
     private void checkDateAvailability(String description) {
-        // הפורמט חייב להיות אחיד וללא תלות באזור זמן, אז נשמור תמיד ב-UTC
-        SimpleDateFormat dateKeyFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm");
-        dateKeyFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        SimpleDateFormat dateKeyFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm", Locale.getDefault());
+        dateKeyFormat.setTimeZone(TimeZone.getDefault());
+
         String dateKey = dateKeyFormat.format(selectedDate);
 
         db.collection("appointments_global")
@@ -221,8 +240,6 @@ public class Make_An_appointment extends AppCompatActivity {
         Map<String, Object> appointment = new HashMap<>();
         appointment.put("description", description);
         appointment.put("knowsProblem", knowsProblem);
-
-        // שומרים את התאריך במועד הנכון (UTC)
         appointment.put("date", selectedDate);
         appointment.put("timestamp", new Date());
 
@@ -244,6 +261,8 @@ public class Make_An_appointment extends AppCompatActivity {
         if (imageUris.isEmpty()) {
             finishUpload.run();
         } else {
+            final int totalImages = imageUris.size();
+            final int[] uploadedCount = {0};
             for (Uri uri : imageUris) {
                 StorageReference ref = storage.getReference("appointment_images/" + UUID.randomUUID());
                 ref.putFile(uri).continueWithTask(task -> {
@@ -251,7 +270,8 @@ public class Make_An_appointment extends AppCompatActivity {
                     return ref.getDownloadUrl();
                 }).addOnSuccessListener(uriResult -> {
                     imageUrls.add(uriResult.toString());
-                    if (imageUrls.size() == imageUris.size()) {
+                    uploadedCount[0]++;
+                    if (uploadedCount[0] == totalImages) {
                         finishUpload.run();
                     }
                 }).addOnFailureListener(e ->
@@ -260,3 +280,4 @@ public class Make_An_appointment extends AppCompatActivity {
         }
     }
 }
+

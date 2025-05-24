@@ -24,7 +24,7 @@
 
         <TextView
             android:id="@+id/clientIdTextView"
-            android:layout_width="308dp"
+            android:layout_width="282dp"
             android:layout_height="wrap_content"
             android:text="מזהה לקוח: "
             android:textColor="#8D6E63"
@@ -122,23 +122,45 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="83dp" />
+        android:layout_height="83dp"
+        android:padding="16dp"
+        card_view:cardCornerRadius="12dp"
+        card_view:cardElevation="6dp"
+        android:background="#FFF3E0">
+
+        <TextView
+            android:id="@+id/noAppointmentTextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="לא קיים זימון תור"
+            android:textSize="17sp"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:gravity="center" />
+    </androidx.cardview.widget.CardView>
+
+
+
 
     <View
         android:id="@+id/view2"
         android:layout_width="match_parent"
         android:layout_height="74dp" />
 
+
     <Button
         android:id="@+id/button_tor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="24dp"
+        android:backgroundTint="#8D6E63"
+        android:elevation="4dp"
+        android:padding="14dp"
+        android:stateListAnimator="@null"
         android:text="קביעת תור"
-        android:background="#3F51B5"
+        android:textAllCaps="false"
         android:textColor="#FFFFFF"
-        android:textSize="18sp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"/>
-
+        android:textSize="18sp" />
 
 </LinearLayout>
