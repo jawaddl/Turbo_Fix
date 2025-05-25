@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- הרשאות חיוניות -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <!-- הרשאות לקריאה מקבצים (אם תצטרך תמונות מהגלריה למשל) -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- הרשאות לקריאה מקבצים (אם תצטרך תמונות מהגלריה למשל) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
-
-    <!-- הודעות Firebase אם תשתמש -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" /> <!-- הודעות Firebase אם תשתמש -->
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <application
@@ -26,26 +21,40 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Turbo_Fix"
         tools:targetApi="31">
-
+        <activity
+            android:name=".Select_admin"
+            android:exported="false" />
         <!-- כניסה ראשית לאפליקציה -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- שאר האקטיביטיז -->
-        <activity android:name=".Make_An_appointment" android:exported="false" />
-        <activity android:name=".Service_selection" android:exported="false" />
-        <activity android:name=".Admin_Activity" android:exported="false" />
-        <activity android:name=".CustomerIIIInfo" android:exported="false" />
-        <activity android:name=".Client_Activity" android:exported="false" />
-        <activity android:name=".Registration2" android:exported="true" />
-        <activity android:name=".Registration" android:exported="false" />
-
+        </activity> <!-- שאר האקטיביטיז -->
+        <activity
+            android:name=".Make_An_appointment"
+            android:exported="false" />
+        <activity
+            android:name=".Service_selection"
+            android:exported="false" />
+        <activity
+            android:name=".Admin_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".CustomerIIIInfo"
+            android:exported="false" />
+        <activity
+            android:name=".Client_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".Registration2"
+            android:exported="true" />
+        <activity
+            android:name=".Registration"
+            android:exported="false" />
     </application>
 
 </manifest>

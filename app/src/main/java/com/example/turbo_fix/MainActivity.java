@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         // בדיקה אם המשתמש הוא ADMIN
         if (email.equals("a") && password.equals("b")) {
-            Intent intent = new Intent(MainActivity.this, Admin_Activity.class);
+            Intent intent = new Intent(MainActivity.this, Select_admin.class);
             startActivity(intent);
             finish();
             return;

@@ -51,7 +51,7 @@ public class CustomerIIIInfo extends AppCompatActivity {
 
         // חיבור לאקטיביטי הקודם (Admin_Activity) כאשר לוחצים על כפתור חזרה
         backButton.setOnClickListener(v -> {
-            Intent intent = new Intent(CustomerIIIInfo.this, Admin_Activity.class);
+            Intent intent = new Intent(CustomerIIIInfo.this, Select_admin.class);
             startActivity(intent);
             finish(); // סוגר את האקטיביטי הנוכחי
         });
