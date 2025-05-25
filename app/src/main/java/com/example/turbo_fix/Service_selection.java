@@ -1,6 +1,7 @@
 package com.example.turbo_fix;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
@@ -14,6 +15,7 @@ public class Service_selection extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().setStatusBarColor(Color.parseColor("#8D6E63"));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_service_selection);
 

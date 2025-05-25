@@ -25,6 +25,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class Client_Activity extends AppCompatActivity {
 
     private TextView clientIdTextView, clientNameTextView, carTypeTextView, kilometersTextView, carModelTextView;
@@ -37,6 +41,7 @@ public class Client_Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);
+        getWindow().setStatusBarColor(Color.parseColor("#8D6E63"));
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
 
@@ -130,17 +135,20 @@ public class Client_Activity extends AppCompatActivity {
 
     private void checkAppointment(String clientId) {
         db.collection("USER").document(clientId)
-                .collection("Appointments")
+                .collection("appointments")
                 .limit(1)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     if (!queryDocumentSnapshots.isEmpty()) {
                         DocumentSnapshot appointment = queryDocumentSnapshots.getDocuments().get(0);
-                        String date = appointment.getString("date");
-                        String time = appointment.getString("time");
-
-                        if (date != null && time != null) {
-                            noAppointmentTextView.setText("תור נקבע ל־" + date + " בשעה " + time);
+                        Date appointmentDate = appointment.getDate("date");
+                        
+                        if (appointmentDate != null) {
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                            String formattedDate = dateFormat.format(appointmentDate);
+                            String formattedTime = timeFormat.format(appointmentDate);
+                            noAppointmentTextView.setText("תור נקבע לתאריך - " + formattedDate + "\n" + "בשעה: " + formattedTime);
                             noAppointmentTextView.setTextColor(Color.parseColor("#000000"));
                         } else {
                             noAppointmentTextView.setText("תור קיים אך חסר מידע");
