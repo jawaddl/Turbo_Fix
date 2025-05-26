@@ -75,6 +75,10 @@ public class Client_Activity extends AppCompatActivity implements OnMapReadyCall
     private static final LatLng GARAGE_LOCATION = new LatLng(32.234986337467134, 34.96518895452847);
     private static final String GARAGE_ADDRESS = "דרך אל סולטאני, טירה";
 
+    // Add tempLocation as a class variable
+    private LatLng tempLocation; // Store temporary searched location
+    private LatLng tempSearchLocation; // Store the searched location temporarily
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -178,6 +182,21 @@ public class Client_Activity extends AppCompatActivity implements OnMapReadyCall
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                // Clear search and revert to current location if search is cleared
+                if (newText.isEmpty()) {
+                    if (currentLocation != null) {
+                        LatLng userLocation = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                        startLocation = userLocation;
+                        
+                        mMap.clear();
+                        mMap.addMarker(new MarkerOptions()
+                                .position(userLocation)
+                                .title("המיקום שלי"));
+                        addGarageMarker();
+                        drawRoute(userLocation, GARAGE_LOCATION);
+                        updateLocationInfo(userLocation, "המיקום הנוכחי שלי");
+                    }
+                }
                 return false;
             }
         });
@@ -185,23 +204,61 @@ public class Client_Activity extends AppCompatActivity implements OnMapReadyCall
 
     private void setupNavigateButton() {
         navigateButton.setOnClickListener(v -> {
-            if (startLocation != null) {
-                // Navigate from current start location to garage
-                Uri gmmIntentUri = Uri.parse(String.format(Locale.US,
-                    "google.navigation:q=%f,%f",
-                    GARAGE_LOCATION.latitude,
-                    GARAGE_LOCATION.longitude));
-                
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                
-                if (mapIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(mapIntent);
-                } else {
-                    Toast.makeText(this, "אנא התקן את Google Maps", Toast.LENGTH_SHORT).show();
+            // Get the current search query
+            String searchQuery = searchView.getQuery().toString();
+            
+            // If there's a search query, geocode it and use that location
+            if (!searchQuery.isEmpty()) {
+                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+                try {
+                    List<Address> addresses = geocoder.getFromLocationName(searchQuery, 1);
+                    if (addresses != null && !addresses.isEmpty()) {
+                        Address address = addresses.get(0);
+                        LatLng searchedLocation = new LatLng(address.getLatitude(), address.getLongitude());
+                        
+                        // Create a URI for directions from searched location to garage
+                        String uri = String.format(Locale.US, 
+                            "https://www.google.com/maps/dir/%f,%f/%f,%f",
+                            searchedLocation.latitude,
+                            searchedLocation.longitude,
+                            GARAGE_LOCATION.latitude,
+                            GARAGE_LOCATION.longitude);
+                            
+                        Intent mapIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                        mapIntent.setPackage("com.google.android.apps.maps");
+                        
+                        if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                            startActivity(mapIntent);
+                        } else {
+                            Toast.makeText(this, "אנא התקן את Google Maps", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(this, "לא נמצאה כתובת", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    Toast.makeText(this, "שגיאה בחיפוש הכתובת", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(this, "נקודת התחלה לא זמינה", Toast.LENGTH_SHORT).show();
+                // No search query - use current location
+                if (currentLocation != null) {
+                    String uri = String.format(Locale.US, 
+                        "https://www.google.com/maps/dir/%f,%f/%f,%f",
+                        currentLocation.getLatitude(),
+                        currentLocation.getLongitude(),
+                        GARAGE_LOCATION.latitude,
+                        GARAGE_LOCATION.longitude);
+                        
+                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                    mapIntent.setPackage("com.google.android.apps.maps");
+                    
+                    if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                        startActivity(mapIntent);
+                    } else {
+                        Toast.makeText(this, "אנא התקן את Google Maps", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(this, "לא זמין מיקום נוכחי", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -213,7 +270,6 @@ public class Client_Activity extends AppCompatActivity implements OnMapReadyCall
             if (addresses != null && !addresses.isEmpty()) {
                 Address address = addresses.get(0);
                 LatLng searchedLocation = new LatLng(address.getLatitude(), address.getLongitude());
-                startLocation = searchedLocation; // Update start location
                 
                 // Clear previous markers and route
                 mMap.clear();
@@ -229,8 +285,11 @@ public class Client_Activity extends AppCompatActivity implements OnMapReadyCall
                 // Draw route from searched location to garage
                 drawRoute(searchedLocation, GARAGE_LOCATION);
                 
-                // Update location info
+                // Update location info with searched location
                 updateLocationInfo(searchedLocation, query);
+                
+                // Store this as the current start location
+                startLocation = searchedLocation;
             }
         } catch (IOException e) {
             Toast.makeText(this, "לא נמצאה כתובת", Toast.LENGTH_SHORT).show();
@@ -266,26 +325,30 @@ public class Client_Activity extends AppCompatActivity implements OnMapReadyCall
             locationTask.addOnSuccessListener(location -> {
                 if (location != null) {
                     currentLocation = location;
-                    LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                    startLocation = userLocation; // Set as start location
                     
-                    if (mMap != null) {
-                        // Clear previous markers and route
-                        mMap.clear();
+                    // Only update the map if there's no active search
+                    if (searchView.getQuery().toString().isEmpty()) {
+                        LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                        startLocation = userLocation;
                         
-                        // Add marker for user's location
-                        mMap.addMarker(new MarkerOptions()
-                                .position(userLocation)
-                                .title("המיקום שלי"));
-                        
-                        // Add garage marker
-                        addGarageMarker();
-                        
-                        // Draw route to garage
-                        drawRoute(userLocation, GARAGE_LOCATION);
-                        
-                        // Update location info
-                        updateLocationInfo(userLocation, "המיקום הנוכחי שלי");
+                        if (mMap != null) {
+                            // Clear previous markers and route
+                            mMap.clear();
+                            
+                            // Add marker for user's location
+                            mMap.addMarker(new MarkerOptions()
+                                    .position(userLocation)
+                                    .title("המיקום שלי"));
+                            
+                            // Add garage marker
+                            addGarageMarker();
+                            
+                            // Draw route to garage
+                            drawRoute(userLocation, GARAGE_LOCATION);
+                            
+                            // Update location info
+                            updateLocationInfo(userLocation, "המיקום הנוכחי שלי");
+                        }
                     }
                 }
             });
