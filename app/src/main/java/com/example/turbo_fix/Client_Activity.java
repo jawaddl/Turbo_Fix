@@ -35,8 +35,8 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -65,6 +65,7 @@ public class Client_Activity extends AppCompatActivity implements OnMapReadyCall
     private FirebaseFirestore db;
     private String clientId;
     private GoogleMap mMap;
+    private MapView mapView;
     private FusedLocationProviderClient fusedLocationClient;
     private Location currentLocation;
     private Polyline currentRoute;
@@ -78,6 +79,8 @@ public class Client_Activity extends AppCompatActivity implements OnMapReadyCall
     // Add tempLocation as a class variable
     private LatLng tempLocation; // Store temporary searched location
     private LatLng tempSearchLocation; // Store the searched location temporarily
+
+    private AppointmentDetailsFragment appointmentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,26 +99,28 @@ public class Client_Activity extends AppCompatActivity implements OnMapReadyCall
         carModelTextView = findViewById(R.id.carModelTextView);
         kilometersTextView = findViewById(R.id.kilometersTextView);
         carTypeTextView = findViewById(R.id.carTypeTextView);
-        noAppointmentTextView = findViewById(R.id.noAppointmentTextView);
         locationInfoTextView = findViewById(R.id.locationInfoTextView);
         button_tor = findViewById(R.id.button_tor);
         ImageButton wrenchButton = findViewById(R.id.wrenchButton);
-        ImageButton refreshButton = findViewById(R.id.refreshButton);
         searchView = findViewById(R.id.searchView);
         navigateButton = findViewById(R.id.navigateButton);
+        mapView = findViewById(R.id.map);
+
+        // Initialize and add the appointment fragment
+        appointmentFragment = AppointmentDetailsFragment.newInstance(null, "לא קיים זימון תור");
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.appointment_fragment_container, appointmentFragment)
+                .commit();
+
+        // Initialize map
+        mapView.onCreate(savedInstanceState);
+        mapView.getMapAsync(this);
 
         // Set up search functionality
         setupSearchView();
 
         // Set up navigation button
         setupNavigateButton();
-
-        // Initialize map
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
-        }
 
         db = FirebaseFirestore.getInstance();
 
@@ -129,12 +134,6 @@ public class Client_Activity extends AppCompatActivity implements OnMapReadyCall
         } else {
             Toast.makeText(this, "לא התקבל מזהה לקוח", Toast.LENGTH_SHORT).show();
         }
-
-        refreshButton.setOnClickListener(v -> {
-            if (clientId != null && !clientId.isEmpty()) {
-                checkAppointment(clientId);
-            }
-        });
 
         wrenchButton.setOnClickListener(v -> {
             PopupMenu popupMenu = new PopupMenu(Client_Activity.this, v);
@@ -429,9 +428,34 @@ public class Client_Activity extends AppCompatActivity implements OnMapReadyCall
     @Override
     protected void onResume() {
         super.onResume();
+        mapView.onResume();
         if (clientId != null && !clientId.isEmpty()) {
             checkAppointment(clientId);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 
     private void fetchClientData(String clientId) {
@@ -471,28 +495,16 @@ public class Client_Activity extends AppCompatActivity implements OnMapReadyCall
                         Date appointmentDate = appointment.getDate("date");
                         
                         if (appointmentDate != null) {
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                            String formattedDate = dateFormat.format(appointmentDate);
-                            String formattedTime = timeFormat.format(appointmentDate);
-                            noAppointmentTextView.setText("תור נקבע לתאריך - " + formattedDate + "\n" + "בשעה: " + formattedTime);
-                            noAppointmentTextView.setTextColor(Color.parseColor("#000000"));
-                            noAppointmentTextView.setVisibility(View.VISIBLE);
+                            appointmentFragment.updateAppointmentInfo(appointmentDate, null);
                         } else {
-                            noAppointmentTextView.setText("תור קיים אך חסר מידע");
-                            noAppointmentTextView.setTextColor(Color.RED);
-                            noAppointmentTextView.setVisibility(View.VISIBLE);
+                            appointmentFragment.updateAppointmentInfo(null, "תור קיים אך חסר מידע");
                         }
                     } else {
-                        noAppointmentTextView.setText("לא קיים זימון תור");
-                        noAppointmentTextView.setTextColor(Color.BLACK);
-                        noAppointmentTextView.setVisibility(View.VISIBLE);
+                        appointmentFragment.updateAppointmentInfo(null, "לא קיים זימון תור");
                     }
                 })
                 .addOnFailureListener(e -> {
-                    noAppointmentTextView.setText("שגיאה בבדיקת תור");
-                    noAppointmentTextView.setTextColor(Color.RED);
-                    noAppointmentTextView.setVisibility(View.VISIBLE);
+                    appointmentFragment.updateAppointmentInfo(null, "שגיאה בבדיקת תור");
                 });
     }
 

@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.app.AlertDialog;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -120,32 +121,55 @@ public class CustomerIIIInfo extends AppCompatActivity {
     }
 
     private void displayImages(List<String> imageUrls) {
-        imageContainer.removeAllViews();
         if (imageUrls != null && !imageUrls.isEmpty()) {
-            int maxImages = Math.min(imageUrls.size(), 4);
-            for (int i = 0; i < maxImages; i++) {
-                final int index = i;
+            imageContainer.removeAllViews();
+            for (String imageUrl : imageUrls) {
                 ImageView imageView = new ImageView(this);
-                imageView.setLayoutParams(new LinearLayout.LayoutParams(
-                        590,
-                        640));
-                imageView.setPadding(4, 4, 4, 4);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    dpToPx(100),
+                    dpToPx(100));
+                layoutParams.setMargins(0, 0, dpToPx(8), 0);
+                imageView.setLayoutParams(layoutParams);
+                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
                 Glide.with(this)
-                        .load(imageUrls.get(i))
-                        .into(imageView);
+                    .load(imageUrl)
+                    .into(imageView);
 
-                imageView.setOnClickListener(v -> showFullScreenImage(imageUrls.get(index)));
+                imageView.setOnClickListener(v -> showFullScreenImage(imageUrl));
                 imageContainer.addView(imageView);
             }
-        } else {
-            Toast.makeText(this, "אין תמונות זמינות", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void showFullScreenImage(String imageUrl) {
-        FullScreenImageDialog dialog = new FullScreenImageDialog(imageUrl);
-        dialog.show(getSupportFragmentManager(), "FullScreenImageDialog");
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        
+        // Create ImageView
+        ImageView imageView = new ImageView(this);
+        imageView.setLayoutParams(new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.MATCH_PARENT));
+        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        
+        // Load image using Glide
+        Glide.with(this)
+            .load(imageUrl)
+            .into(imageView);
+        
+        // Create and show dialog
+        builder.setView(imageView);
+        AlertDialog dialog = builder.create();
+        
+        // Close dialog when clicking the image
+        imageView.setOnClickListener(v -> dialog.dismiss());
+        
+        dialog.show();
+    }
+
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
     }
 
     private class FetchVehicleDataTask extends AsyncTask<String, Void, String> {

@@ -123,45 +123,11 @@
             android:layout_width="match_parent"
             android:layout_height="16dp" />
 
-        <!-- Appointment Status Card -->
-        <androidx.cardview.widget.CardView
+        <!-- Appointment Details Fragment Container -->
+        <FrameLayout
+            android:id="@+id/appointment_fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            card_view:cardCornerRadius="12dp"
-            card_view:cardElevation="6dp"
-            android:background="#FFF3E0">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/noAppointmentTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="לא קיים זימון תור"
-                    android:textSize="17sp"
-                    android:textColor="#000000"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:minHeight="83dp" />
-
-                <ImageButton
-                    android:id="@+id/refreshButton"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@android:drawable/ic_menu_rotate"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="8dp"
-                    android:tint="#8D6E63" />
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
+            android:layout_height="wrap_content" />
 
         <!-- Google Maps Card -->
         <androidx.cardview.widget.CardView
@@ -207,9 +173,8 @@
                     android:textAlignment="viewStart"
                     android:background="#F5F5F5"/>
 
-                <fragment
+                <com.google.android.gms.maps.MapView
                     android:id="@+id/map"
-                    android:name="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"/>
 
