@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -53,6 +54,7 @@ public class Client_Activity extends AppCompatActivity {
         noAppointmentTextView = findViewById(R.id.noAppointmentTextView);
         button_tor = findViewById(R.id.button_tor);
         ImageButton wrenchButton = findViewById(R.id.wrenchButton);
+        ImageButton refreshButton = findViewById(R.id.refreshButton);
 
         db = FirebaseFirestore.getInstance();
 
@@ -66,6 +68,12 @@ public class Client_Activity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "לא התקבל מזהה לקוח", Toast.LENGTH_SHORT).show();
         }
+
+        refreshButton.setOnClickListener(v -> {
+            if (clientId != null && !clientId.isEmpty()) {
+                checkAppointment(clientId);
+            }
+        });
 
         wrenchButton.setOnClickListener(v -> {
             PopupMenu popupMenu = new PopupMenu(Client_Activity.this, v);
@@ -150,18 +158,22 @@ public class Client_Activity extends AppCompatActivity {
                             String formattedTime = timeFormat.format(appointmentDate);
                             noAppointmentTextView.setText("תור נקבע לתאריך - " + formattedDate + "\n" + "בשעה: " + formattedTime);
                             noAppointmentTextView.setTextColor(Color.parseColor("#000000"));
+                            noAppointmentTextView.setVisibility(View.VISIBLE);
                         } else {
                             noAppointmentTextView.setText("תור קיים אך חסר מידע");
                             noAppointmentTextView.setTextColor(Color.RED);
+                            noAppointmentTextView.setVisibility(View.VISIBLE);
                         }
                     } else {
                         noAppointmentTextView.setText("לא קיים זימון תור");
                         noAppointmentTextView.setTextColor(Color.BLACK);
+                        noAppointmentTextView.setVisibility(View.VISIBLE);
                     }
                 })
                 .addOnFailureListener(e -> {
                     noAppointmentTextView.setText("שגיאה בבדיקת תור");
                     noAppointmentTextView.setTextColor(Color.RED);
+                    noAppointmentTextView.setVisibility(View.VISIBLE);
                 });
     }
 

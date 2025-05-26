@@ -122,31 +122,47 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="83dp"
+        android:layout_height="wrap_content"
         android:padding="16dp"
         card_view:cardCornerRadius="12dp"
         card_view:cardElevation="6dp"
         android:background="#FFF3E0">
 
-        <TextView
-            android:id="@+id/noAppointmentTextView"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="לא קיים זימון תור"
-            android:textSize="17sp"
-            android:textColor="#000000"
-            android:textStyle="bold"
-            android:gravity="center" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/noAppointmentTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="לא קיים זימון תור"
+                android:textSize="17sp"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:minHeight="83dp" />
+
+            <ImageButton
+                android:id="@+id/refreshButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_rotate"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                android:tint="#8D6E63" />
+
+        </LinearLayout>
+
     </androidx.cardview.widget.CardView>
-
-
-
 
     <View
         android:id="@+id/view2"
         android:layout_width="match_parent"
         android:layout_height="74dp" />
-
 
     <Button
         android:id="@+id/button_tor"

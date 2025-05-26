@@ -17,6 +17,16 @@
             android:layout_height="?attr/actionBarSize"
             android:elevation="4dp">
 
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@android:drawable/ic_menu_revert"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:tint="#FFFFFF"
+                android:padding="12dp"
+                android:layout_gravity="start"/>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -58,13 +68,21 @@
                 android:layout_height="wrap_content"
                 android:text="מחר" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipWeek"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="השבוע" />
         </com.google.android.material.chip.ChipGroup>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/blockHoursButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="חסום שעות"
+            android:textColor="#FFFFFF"
+            app:icon="@android:drawable/ic_menu_close_clear_cancel"
+            app:iconTint="#FFFFFF"
+            style="@style/Widget.MaterialComponents.Button"
+            android:backgroundTint="#D32F2F"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 

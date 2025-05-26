@@ -10,6 +10,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import android.content.SharedPreferences;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,39 +53,49 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // בדיקה אם המשתמש הוא ADMIN
-        if (email.equals("a") && password.equals("b")) {
-            Intent intent = new Intent(MainActivity.this, Select_admin.class);
-            startActivity(intent);
+        // Check for admin login (case insensitive)
+        if (email.equalsIgnoreCase("a") && password.equalsIgnoreCase("b")) {
+            // Save admin credentials
+            SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("username", "a");
+            editor.putString("password", "b");
+            editor.apply();
+
+            // Navigate to admin screen
+            startActivity(new Intent(MainActivity.this, Select_admin.class));
             finish();
             return;
         }
 
+        // Regular user login
         firestore.collection("USER")
                 .whereEqualTo("email", email)
-                .whereEqualTo("password", password)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         QuerySnapshot querySnapshot = task.getResult();
                         if (querySnapshot != null && !querySnapshot.isEmpty()) {
                             DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
-                            String clientId = documentSnapshot.getId();
-
-                            Intent intent = new Intent(MainActivity.this, Client_Activity.class);
-                            intent.putExtra("clientId", clientId);
-                            startActivity(intent);
-                            finish();
-
-                            Toast.makeText(MainActivity.this, "ההתחברות הצליחה", Toast.LENGTH_SHORT).show();
+                            String storedPassword = documentSnapshot.getString("password");
+                            
+                            // Check if password matches
+                            if (password.equals(storedPassword)) {
+                                String clientId = documentSnapshot.getId();
+                                Intent intent = new Intent(MainActivity.this, Client_Activity.class);
+                                intent.putExtra("clientId", clientId);
+                                startActivity(intent);
+                                finish();
+                                Toast.makeText(MainActivity.this, "ההתחברות הצליחה", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(MainActivity.this, "סיסמה שגויה", Toast.LENGTH_SHORT).show();
+                            }
                         } else {
-                            Toast.makeText(MainActivity.this, "פרטי ההתחברות שגויים", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "משתמש לא נמצא", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(MainActivity.this, "שגיאה בהתחברות", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "שגיאה בהתחברות: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 }
-
-

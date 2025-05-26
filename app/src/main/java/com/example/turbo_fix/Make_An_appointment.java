@@ -42,7 +42,7 @@ public class Make_An_appointment extends AppCompatActivity {
 
     String clientId;
     String fullName = "";
-    Date selectedDate = null;
+    Calendar selectedDate = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,62 +192,109 @@ public class Make_An_appointment extends AppCompatActivity {
         List<String> validTimes = Arrays.asList("08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00",
                 "11:30", "12:00", "12:30", "13:00", "13:30", "14:00");
 
-        // Format the date part for Firebase queries using the same format as when saving
-        SimpleDateFormat dateKeyFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        String selectedDateStr = dateKeyFormat.format(date.getTime());
+        // Format the date part for Firebase queries
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        dateFormat.setTimeZone(TimeZone.getDefault()); // Use device's time zone
+        String selectedDateStr = dateFormat.format(date.getTime());
 
-        // Create a list to store booked times
-        List<String> bookedTimes = new ArrayList<>();
+        // If selected date is today, filter out past times
+        List<String> availableTimes = new ArrayList<>(validTimes);
+        Calendar now = Calendar.getInstance();
+        if (dateFormat.format(now.getTime()).equals(selectedDateStr)) {
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            timeFormat.setTimeZone(TimeZone.getDefault()); // Use device's time zone
+            String currentTime = timeFormat.format(now.getTime());
+            availableTimes.removeIf(time -> time.compareTo(currentTime) <= 0);
+            
+            if (availableTimes.isEmpty()) {
+                Toast.makeText(this, "לא נותרו תורים זמינים להיום", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
 
-        // Query appointments_global for the selected date
-        db.collection("appointments_global")
-                .whereEqualTo("booked", true)  // Only get booked appointments
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    // Get all booked times for this date
-                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                        String docId = doc.getId();
-                        if (docId.startsWith(selectedDateStr)) {
-                            String[] parts = docId.split("_");
-                            if (parts.length > 1) {
-                                bookedTimes.add(parts[1]); // Add the time part
+        // Create a list to store unavailable times
+        List<String> unavailableTimes = new ArrayList<>();
+
+        // First check if the entire day is blocked
+        db.collection("USER")
+            .document("admin_settings")
+            .collection("blocked_hours")
+            .document(selectedDateStr)
+            .get()
+            .addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists() && Boolean.TRUE.equals(documentSnapshot.getBoolean("blocked"))) {
+                    Toast.makeText(this, "יום זה חסום על ידי המנהל", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Then check for specific blocked hours
+                db.collection("USER")
+                    .document("admin_settings")
+                    .collection("blocked_hours")
+                    .whereEqualTo("blocked", true)
+                    .get()
+                    .addOnSuccessListener(querySnapshot -> {
+                        // Get blocked hours
+                        for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                            String docId = doc.getId();
+                            if (docId.startsWith(selectedDateStr)) {
+                                String hour = doc.getString("hour");
+                                if (hour != null) {
+                                    unavailableTimes.add(hour);
+                                }
                             }
                         }
-                    }
 
-                    // Create list of available times by removing booked times
-                    List<String> availableTimes = new ArrayList<>(validTimes);
-                    availableTimes.removeAll(bookedTimes);
+                        // Then check booked appointments
+                        db.collection("appointments_global")
+                            .whereEqualTo("booked", true)
+                            .get()
+                            .addOnSuccessListener(appointmentsSnapshot -> {
+                                // Get booked times
+                                for (DocumentSnapshot doc : appointmentsSnapshot.getDocuments()) {
+                                    String docId = doc.getId();
+                                    if (docId.startsWith(selectedDateStr)) {
+                                        String[] parts = docId.split("_");
+                                        if (parts.length > 1) {
+                                            unavailableTimes.add(parts[1]);
+                                        }
+                                    }
+                                }
 
-                    if (availableTimes.isEmpty()) {
-                        Toast.makeText(this, "אין תורים פנויים ביום זה", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+                                // Remove unavailable times
+                                availableTimes.removeAll(unavailableTimes);
 
-                    // Sort available times
-                    Collections.sort(availableTimes);
-                    
-                    String[] timeArray = availableTimes.toArray(new String[0]);
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("בחר שעה פנויה");
-                    builder.setItems(timeArray, (dialog, which) -> {
-                        String[] parts = timeArray[which].split(":");
-                        int hour = Integer.parseInt(parts[0]);
-                        int minute = Integer.parseInt(parts[1]);
-                        date.set(Calendar.HOUR_OF_DAY, hour);
-                        date.set(Calendar.MINUTE, minute);
-                        date.set(Calendar.SECOND, 0);
-                        date.set(Calendar.MILLISECOND, 0);
+                                if (availableTimes.isEmpty()) {
+                                    Toast.makeText(this, "אין תורים פנויים ביום זה", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
 
-                        selectedDate = date.getTime();
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
-                        selectedDateTextView.setText("תאריך שנבחר: " + sdf.format(selectedDate));
+                                // Sort available times
+                                Collections.sort(availableTimes);
+                                
+                                String[] timeArray = availableTimes.toArray(new String[0]);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                                builder.setTitle("בחר שעה פנויה");
+                                builder.setItems(timeArray, (dialog, which) -> {
+                                    if (selectedDate == null) {
+                                        selectedDate = Calendar.getInstance();
+                                    }
+                                    selectedDate.setTime(date.getTime()); // Copy the date from the parameter
+                                    String[] timeParts = timeArray[which].split(":");
+                                    selectedDate.set(Calendar.HOUR_OF_DAY, Integer.parseInt(timeParts[0]));
+                                    selectedDate.set(Calendar.MINUTE, Integer.parseInt(timeParts[1]));
+                                    selectedDate.set(Calendar.SECOND, 0);
+                                    selectedDate.set(Calendar.MILLISECOND, 0);
+                                    selectedDate.setTimeZone(TimeZone.getDefault()); // Use device's time zone
+                                    
+                                    SimpleDateFormat displayFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+                                    displayFormat.setTimeZone(TimeZone.getDefault()); // Use device's time zone
+                                    selectedDateTextView.setText(displayFormat.format(selectedDate.getTime()));
+                                });
+                                builder.show();
+                            });
                     });
-                    builder.show();
-                })
-                .addOnFailureListener(e -> 
-                    Toast.makeText(this, "שגיאה בטעינת זמנים זמינים: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                );
+            });
     }
 
     private void openGallery() {
@@ -277,66 +324,81 @@ public class Make_An_appointment extends AppCompatActivity {
                         return;
                     }
 
-                    // If no existing appointment, proceed with date availability check
-                    SimpleDateFormat dateKeyFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm", Locale.getDefault());
-                    String dateKey = dateKeyFormat.format(selectedDate);
+                    // Check if this time slot is already booked by another user
+                    db.collection("USER")
+                        .get()
+                        .addOnSuccessListener(userSnapshots -> {
+                            final boolean[] isTimeSlotTaken = {false};
+                            final int[] processedUsers = {0};
+                            final int totalUsers = userSnapshots.size() - 1; // Minus admin_settings
 
-                    // Check if this specific time slot is already booked
-                    db.collection("appointments_global")
-                            .document(dateKey)
-                            .get()
-                            .addOnSuccessListener(document -> {
-                                if (document.exists() && Boolean.TRUE.equals(document.getBoolean("booked"))) {
-                                    Toast.makeText(this, "תאריך זה כבר תפוס. אנא בחר תאריך אחר.", Toast.LENGTH_LONG).show();
-                                } else {
-                                    uploadAppointmentToFirebase(description, dateKey);
+                            for (DocumentSnapshot userDoc : userSnapshots.getDocuments()) {
+                                if (userDoc.getId().equals("admin_settings")) {
+                                    continue;
                                 }
-                            })
-                            .addOnFailureListener(e ->
-                                    Toast.makeText(this, "שגיאה בבדיקת תאריך: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+
+                                userDoc.getReference()
+                                    .collection("appointments")
+                                    .whereEqualTo("date", new com.google.firebase.Timestamp(new Date(selectedDate.getTimeInMillis())))
+                                    .get()
+                                    .addOnSuccessListener(appointmentSnapshots -> {
+                                        if (!appointmentSnapshots.isEmpty()) {
+                                            isTimeSlotTaken[0] = true;
+                                        }
+                                        
+                                        processedUsers[0]++;
+                                        if (processedUsers[0] == totalUsers) {
+                                            // All users checked
+                                            if (isTimeSlotTaken[0]) {
+                                                Toast.makeText(Make_An_appointment.this, 
+                                                    "תאריך זה כבר תפוס. אנא בחר תאריך אחר.", 
+                                                    Toast.LENGTH_LONG).show();
+                                            } else {
+                                                uploadAppointmentToFirebase(description);
+                                            }
+                                        }
+                                    });
+                            }
+                        })
+                        .addOnFailureListener(e ->
+                            Toast.makeText(this, "שגיאה בבדיקת זמינות: " + e.getMessage(), 
+                                Toast.LENGTH_SHORT).show());
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(this, "שגיאה בבדיקת תורים קיימים: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    Toast.makeText(this, "שגיאה בבדיקת תורים קיימים: " + e.getMessage(), 
+                        Toast.LENGTH_SHORT).show());
     }
 
-    private void uploadAppointmentToFirebase(String description, String dateKey) {
+    private void uploadAppointmentToFirebase(String description) {
         Map<String, Object> appointment = new HashMap<>();
         appointment.put("description", description);
         appointment.put("knowsProblem", knowsProblem);
-        appointment.put("date", selectedDate);
-        appointment.put("timestamp", new Date());
+
+        // Store exactly what was selected, without any timezone adjustments
+        appointment.put("date", new com.google.firebase.Timestamp(selectedDate.getTime()));
+        appointment.put("timestamp", new com.google.firebase.Timestamp(new Date()));
 
         List<String> imageUrls = new ArrayList<>();
 
         Runnable finishUpload = () -> {
             appointment.put("imageUrls", imageUrls);
             
-            // First create the global appointment
-            db.collection("appointments_global")
-                .document(dateKey)
-                .set(Collections.singletonMap("booked", true))
-                .addOnSuccessListener(aVoid -> {
-                    // Then create the user's appointment
-                    db.collection("USER").document(clientId)
-                        .collection("appointments")
-                        .add(appointment)
-                        .addOnSuccessListener(doc -> {
-                            Toast.makeText(this, "הבקשה נשלחה בהצלחה!", Toast.LENGTH_SHORT).show();
-                            
-                            // Return to Client_Activity
-                            Intent intent = new Intent(Make_An_appointment.this, Client_Activity.class);
-                            intent.putExtra("clientId", clientId);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            finish();
-                        })
-                        .addOnFailureListener(e -> {
-                            // If user appointment fails, remove the global appointment
-                            db.collection("appointments_global").document(dateKey).delete();
-                            Toast.makeText(this, "שגיאה: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        });
+            // Create the user's appointment
+            db.collection("USER").document(clientId)
+                .collection("appointments")
+                .add(appointment)
+                .addOnSuccessListener(doc -> {
+                    Toast.makeText(this, "הבקשה נשלחה בהצלחה!", Toast.LENGTH_SHORT).show();
+                    
+                    // Return to Client_Activity
+                    Intent intent = new Intent(Make_An_appointment.this, Client_Activity.class);
+                    intent.putExtra("clientId", clientId);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "שגיאה: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> 
+                    Toast.makeText(this, "שגיאה: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         };
 
         if (imageUris.isEmpty()) {
@@ -356,7 +418,7 @@ public class Make_An_appointment extends AppCompatActivity {
                         finishUpload.run();
                     }
                 }).addOnFailureListener(e ->
-                        Toast.makeText(this, "שגיאה בהעלאת תמונה: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    Toast.makeText(this, "שגיאה בהעלאת תמונה: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
         }
     }
