@@ -3,13 +3,12 @@ package com.example.turbo_fix;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import com.google.android.material.card.MaterialCardView;
 
 public class Select_admin extends AppCompatActivity {
 
@@ -25,8 +24,8 @@ public class Select_admin extends AppCompatActivity {
             return insets;
         });
 
-        Button customerInfoBtn = findViewById(R.id.btn_customer_info);
-        Button adminActivityBtn = findViewById(R.id.btn_admin_activity);
+        MaterialCardView customerInfoBtn = findViewById(R.id.btn_customer_info);
+        MaterialCardView adminActivityBtn = findViewById(R.id.btn_admin_activity);
 
         customerInfoBtn.setOnClickListener(v -> {
             Intent intent = new Intent(Select_admin.this, CustomerIIIInfo.class);

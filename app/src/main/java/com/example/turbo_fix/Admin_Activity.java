@@ -479,6 +479,14 @@ public class Admin_Activity extends AppCompatActivity {
         problemTypeText.setText("סוג פנייה: " + (appointment.knowsProblem ? "תקלה ידועה" : "סימפטומים"));
         descriptionText.setText("תיאור: " + appointment.description);
 
+        // Setup copy button
+        copyButton.setOnClickListener(v -> {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("Client ID", appointment.userId);
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(this, "מזהה לקוח הועתק", Toast.LENGTH_SHORT).show();
+        });
+
         // Load images if they exist
         loadingProgress.setVisibility(View.VISIBLE);
         db.collection("USER")

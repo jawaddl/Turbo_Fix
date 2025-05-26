@@ -1,8 +1,23 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.Turbo_Fix" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#8D6E63</item>
+        <item name="colorPrimaryVariant">#6F4E43</item>
+        <item name="colorOnPrimary">@color/white</item>
+        
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">#795548</item>
+        <item name="colorSecondaryVariant">#5D4037</item>
+        <item name="colorOnSecondary">@color/white</item>
+        
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        
+        <!-- Custom attributes -->
+        <item name="android:windowBackground">@color/white</item>
+        <item name="elevationOverlayEnabled">false</item>
     </style>
 
     <style name="Theme.Turbo_Fix" parent="Base.Theme.Turbo_Fix" />
