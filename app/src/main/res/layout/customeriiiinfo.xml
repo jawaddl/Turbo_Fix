@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layoutDirection="rtl">
 
     <!-- גלילה של כל התוכן -->
+
+    <!-- כפתור חזרה -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -14,60 +17,99 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- EditText לחיפוש -->
-            <EditText
-                android:id="@+id/search_edit_text"
+            <!-- כותרת -->
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Enter user ID"
-                android:inputType="text" />
+                android:layout_marginBottom="16dp"
+                android:gravity="center"
+                android:text="חיפוש לקוח"
+                android:textColor="#8D6E63"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <!-- EditText לחיפוש -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="הכנס מזהה לקוח"
+                android:layoutDirection="rtl">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/search_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:textAlignment="viewStart" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- כפתור החיפוש -->
             <Button
                 android:id="@+id/search_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
                 android:backgroundTint="#8D6E63"
-                android:text="Search" />
+                android:text="חפש" />
+
+            <!-- כותרת לתוצאות -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="פרטי לקוח:"
+                android:textColor="#8D6E63"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <!-- TextView שמציג את פרטי המשתמש -->
             <TextView
                 android:id="@+id/result_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="16dp"
-                android:text="aaa"
+                android:paddingTop="8dp"
+                android:paddingBottom="16dp"
+                android:textAlignment="viewStart"
                 android:textSize="16sp" />
+
+            <!-- כותרת לתמונות -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="תמונות רכב:"
+                android:textColor="#8D6E63"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <!-- HorizontalScrollView לתמונות -->
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="8dp">
+                android:layoutDirection="rtl">
 
                 <LinearLayout
                     android:id="@+id/imageContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:gravity="start"
                     android:layoutDirection="rtl"
-                    android:padding="2dp"
-                    android:layout_marginBottom="90sp"
-                    android:layout_marginEnd="100dp" />
+                    android:orientation="horizontal"
+                    android:padding="2dp" />
             </HorizontalScrollView>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- כפתור חזרה בתחתית שמאל -->
     <Button
         android:id="@+id/back_button"
-        android:layout_width="wrap_content"
+        android:layout_width="108dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
+        android:layout_gravity="bottom|left"
         android:layout_margin="16dp"
         android:backgroundTint="#8D6E63"
-        android:text="Back"
+        android:text="חזור"
         android:textColor="#FFFFFF" />
+
 </FrameLayout>

@@ -11,6 +11,8 @@ import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.app.AlertDialog;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -48,13 +50,15 @@ public class CustomerIIIInfo extends AppCompatActivity {
         searchButton = findViewById(R.id.search_button);
         resultTextView = findViewById(R.id.result_text_view);
         imageContainer = findViewById(R.id.imageContainer);
-        backButton = findViewById(R.id.back_button); // חיבור לכפתור חזרה
+        backButton = findViewById(R.id.back_button);
 
-        // חיבור לאקטיביטי הקודם (Admin_Activity) כאשר לוחצים על כפתור חזרה
+        // Set initial text
+        resultTextView.setText("הזן מזהה לקוח לחיפוש");
+
         backButton.setOnClickListener(v -> {
             Intent intent = new Intent(CustomerIIIInfo.this, Select_admin.class);
             startActivity(intent);
-            finish(); // סוגר את האקטיביטי הנוכחי
+            finish();
         });
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -87,37 +91,35 @@ public class CustomerIIIInfo extends AppCompatActivity {
                             accidentInfo += "\nפירוט: " + accidentDetails;
                         }
 
-                        String result = "שם: " + name + "\n"
-                                + "אימייל: " + email + "\n"
-                                + "טלפון: " + phone + "\n"
-                                + "רמת טיפול ברכב: " + serviceLevel + "\n"
-                                + "קילומטראז': " + mileage + "\n"
-                                + "תאונה: " + accidentInfo + "\n"
-                                + "לוחית רישוי: " + vehiclePlate + "\n";
+                        StringBuilder result = new StringBuilder();
+                        result.append("שם מלא: ").append(name != null ? name : "לא ידוע").append("\n");
+                        result.append("דוא״ל: ").append(email != null ? email : "לא ידוע").append("\n");
+                        result.append("טלפון: ").append(phone != null ? phone : "לא ידוע").append("\n");
+                        result.append("רמת טיפול: ").append(serviceLevel != null ? serviceLevel : "לא ידוע").append("\n");
+                        result.append("קילומטראז׳: ").append(mileage != null ? mileage : "לא ידוע").append("\n");
+                        result.append("תאונה: ").append(accidentInfo).append("\n");
+                        result.append("מספר רכב: ").append(vehiclePlate != null ? vehiclePlate : "לא ידוע").append("\n");
 
-                        resultTextView.setText(result);
-
+                        resultTextView.setText(result.toString());
                         displayImages(imageUrls);
 
-                        // Perform the API call to get vehicle data
                         if (vehiclePlate != null && !vehiclePlate.isEmpty()) {
                             String apiUrl = "https://data.gov.il/api/3/action/datastore_search?resource_id=053cea08-09bc-40ec-8f7a-156f0677aff3&q=" + vehiclePlate;
-
                             new FetchVehicleDataTask().execute(apiUrl);
                         }
 
                     } else {
                         Toast.makeText(this, "לא נמצאו תוצאות", Toast.LENGTH_SHORT).show();
+                        resultTextView.setText("לא נמצאו תוצאות");
                         Log.d(TAG, "לא נמצא מסמך עם מזהה: " + documentId);
                     }
                 } else {
                     Toast.makeText(this, "שגיאה בחיפוש", Toast.LENGTH_SHORT).show();
+                    resultTextView.setText("שגיאה בחיפוש");
                     Log.e(TAG, "שגיאה בשליפה: ", task.getException());
                 }
             });
         });
-
-        resultTextView.setText("Enter an ID address");
     }
 
     private void displayImages(List<String> imageUrls) {
@@ -132,39 +134,76 @@ public class CustomerIIIInfo extends AppCompatActivity {
                 imageView.setLayoutParams(layoutParams);
                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
+                // Load thumbnail with error handling
                 Glide.with(this)
                     .load(imageUrl)
+                    .error(android.R.drawable.ic_dialog_alert)
                     .into(imageView);
 
-                imageView.setOnClickListener(v -> showFullScreenImage(imageUrl));
+                imageView.setOnClickListener(v -> {
+                    Log.d("ImageLoading", "Attempting to show full screen image: " + imageUrl);
+                    showFullScreenImage(imageUrl);
+                });
                 imageContainer.addView(imageView);
             }
         }
     }
 
     private void showFullScreenImage(String imageUrl) {
+        // Create the dialog first
         AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_fullscreen_image, null);
         
-        // Create ImageView
-        ImageView imageView = new ImageView(this);
-        imageView.setLayoutParams(new LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.MATCH_PARENT));
-        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        ImageView fullscreenImageView = dialogView.findViewById(R.id.fullscreen_image);
+        ProgressBar loadingIndicator = dialogView.findViewById(R.id.loading_indicator);
         
-        // Load image using Glide
-        Glide.with(this)
-            .load(imageUrl)
-            .into(imageView);
+        // Ensure loading indicator is visible initially
+        loadingIndicator.setVisibility(View.VISIBLE);
         
-        // Create and show dialog
-        builder.setView(imageView);
+        builder.setView(dialogView);
         AlertDialog dialog = builder.create();
         
-        // Close dialog when clicking the image
-        imageView.setOnClickListener(v -> dialog.dismiss());
+        // Load the image
+        Glide.with(this)
+            .load(imageUrl)
+            .error(android.R.drawable.ic_dialog_alert)
+            .listener(new com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable>() {
+                @Override
+                public boolean onLoadFailed(com.bumptech.glide.load.engine.GlideException e, Object model, 
+                    com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target, 
+                    boolean isFirstResource) {
+                    loadingIndicator.setVisibility(View.GONE);
+                    Toast.makeText(CustomerIIIInfo.this, "שגיאה בטעינת התמונה", Toast.LENGTH_SHORT).show();
+                    Log.e("ImageLoading", "Failed to load image: " + imageUrl, e);
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(android.graphics.drawable.Drawable resource, Object model,
+                    com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target,
+                    com.bumptech.glide.load.DataSource dataSource, boolean isFirstResource) {
+                    loadingIndicator.setVisibility(View.GONE);
+                    Log.d("ImageLoading", "Image loaded successfully: " + imageUrl);
+                    return false;
+                }
+            })
+            .into(fullscreenImageView);
+
+        // Close on click
+        dialogView.setOnClickListener(v -> dialog.dismiss());
         
+        // Show dialog and set to full screen
         dialog.show();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setFlags(
+                android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN
+            );
+            dialog.getWindow().setLayout(
+                android.view.WindowManager.LayoutParams.MATCH_PARENT,
+                android.view.WindowManager.LayoutParams.MATCH_PARENT
+            );
+        }
     }
 
     private int dpToPx(int dp) {
