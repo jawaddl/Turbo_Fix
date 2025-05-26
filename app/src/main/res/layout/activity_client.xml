@@ -1,182 +1,248 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <!-- מזהה לקוח -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <ImageButton
-            android:id="@+id/wrenchButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="16dp"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_preferences"
-            android:tint="#000000" />
-
-        <TextView
-            android:id="@+id/clientIdTextView"
-            android:layout_width="282dp"
-            android:layout_height="wrap_content"
-            android:text="מזהה לקוח: "
-            android:textColor="#8D6E63"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <!-- מרווח קטן בין הכותרת למלבן -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="42dp" />
-
-    <!-- כרטיס מידע על הרכב -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="110dp"
-        card_view:cardCornerRadius="12dp"
-        card_view:cardElevation="6dp"
-        android:padding="16dp"
-        android:background="#F5F5F5">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="122dp"
-            android:gravity="center_vertical"
-            android:orientation="vertical">
-
-            <!-- שם הלקוח בצד ימין -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="end"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/clientNameTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="שלום- שם לקוח"
-                    android:textColor="#000000"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- שורת פרטי הרכב -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="75dp"
-                android:layout_marginTop="15dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:weightSum="3.2">
-
-                <TextView
-                    android:id="@+id/carModelTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:text="סוג: מאזדה"
-                    android:textAlignment="textEnd"
-                    android:textColor="#333333"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:id="@+id/kilometersTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="43dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="125,000 ק״מ"
-                    android:textColor="#333333"
-                    android:textSize="16.5sp"
-                    android:translationY="-12dp" />
-
-                <TextView
-                    android:id="@+id/carTypeTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="start"
-                    android:text="דגם: 3 סדאן"
-                    android:textColor="#333333"
-                    android:textSize="15sp" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <View
-        android:id="@+id/view"
-        android:layout_width="match_parent"
-        android:layout_height="41dp" />
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        card_view:cardCornerRadius="12dp"
-        card_view:cardElevation="6dp"
-        android:background="#FFF3E0">
-
+        <!-- מזהה לקוח -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/noAppointmentTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="לא קיים זימון תור"
-                android:textSize="17sp"
-                android:textColor="#000000"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:minHeight="83dp" />
-
             <ImageButton
-                android:id="@+id/refreshButton"
+                android:id="@+id/wrenchButton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@android:drawable/ic_menu_rotate"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="8dp"
-                android:tint="#8D6E63" />
+                android:layout_marginEnd="16dp"
+                android:background="?android:selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_preferences"
+                android:tint="#000000" />
 
+            <TextView
+                android:id="@+id/clientIdTextView"
+                android:layout_width="282dp"
+                android:layout_height="wrap_content"
+                android:text="מזהה לקוח: "
+                android:textColor="#8D6E63"
+                android:textSize="18sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+        <!-- מרווח קטן בין הכותרת למלבן -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="24dp" />
 
-    <View
-        android:id="@+id/view2"
-        android:layout_width="match_parent"
-        android:layout_height="74dp" />
+        <!-- כרטיס מידע על הרכב -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="110dp"
+            card_view:cardCornerRadius="12dp"
+            card_view:cardElevation="6dp"
+            android:padding="16dp"
+            android:background="#F5F5F5">
 
-    <Button
-        android:id="@+id/button_tor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="24dp"
-        android:backgroundTint="#8D6E63"
-        android:elevation="4dp"
-        android:padding="14dp"
-        android:stateListAnimator="@null"
-        android:text="קביעת תור"
-        android:textAllCaps="false"
-        android:textColor="#FFFFFF"
-        android:textSize="18sp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="122dp"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
 
-</LinearLayout>
+                <!-- שם הלקוח בצד ימין -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/clientNameTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="שלום- שם לקוח"
+                        android:textColor="#000000"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- שורת פרטי הרכב -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="75dp"
+                    android:layout_marginTop="15dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:weightSum="3.2">
+
+                    <TextView
+                        android:id="@+id/carModelTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:text="סוג: מאזדה"
+                        android:textAlignment="textEnd"
+                        android:textColor="#333333"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/kilometersTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="43dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="125,000 ק״מ"
+                        android:textColor="#333333"
+                        android:textSize="16.5sp"
+                        android:translationY="-12dp" />
+
+                    <TextView
+                        android:id="@+id/carTypeTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="start"
+                        android:text="דגם: 3 סדאן"
+                        android:textColor="#333333"
+                        android:textSize="15sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="16dp" />
+
+        <!-- Appointment Status Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            card_view:cardCornerRadius="12dp"
+            card_view:cardElevation="6dp"
+            android:background="#FFF3E0">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/noAppointmentTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="לא קיים זימון תור"
+                    android:textSize="17sp"
+                    android:textColor="#000000"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:minHeight="83dp" />
+
+                <ImageButton
+                    android:id="@+id/refreshButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@android:drawable/ic_menu_rotate"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="8dp"
+                    android:tint="#8D6E63" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Google Maps Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            card_view:cardCornerRadius="12dp"
+            card_view:cardElevation="6dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="המוסך שלנו"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:padding="8dp"
+                    android:background="#8D6E63"
+                    android:textColor="#FFFFFF"/>
+
+                <!-- Search View for addresses -->
+                <SearchView
+                    android:id="@+id/searchView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:queryHint="חפש כתובת מוצא..."
+                    android:iconifiedByDefault="false"
+                    android:layout_margin="8dp"
+                    android:background="@android:drawable/editbox_background"/>
+
+                <!-- Location Information -->
+                <TextView
+                    android:id="@+id/locationInfoTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textSize="14sp"
+                    android:textColor="#000000"
+                    android:textAlignment="viewStart"
+                    android:background="#F5F5F5"/>
+
+                <fragment
+                    android:id="@+id/map"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"/>
+
+                <!-- Navigation Button -->
+                <Button
+                    android:id="@+id/navigateButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="נווט למוסך"
+                    android:textSize="16sp"
+                    android:padding="12dp"
+                    android:layout_margin="8dp"
+                    android:backgroundTint="#8D6E63"
+                    android:textColor="#FFFFFF"/>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <Button
+            android:id="@+id/button_tor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="#8D6E63"
+            android:elevation="4dp"
+            android:padding="14dp"
+            android:stateListAnimator="@null"
+            android:text="קביעת תור"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+</ScrollView>

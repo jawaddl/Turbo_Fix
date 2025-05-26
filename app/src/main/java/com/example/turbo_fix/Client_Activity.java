@@ -1,6 +1,12 @@
 package com.example.turbo_fix;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.Spannable;
@@ -14,29 +20,60 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
-public class Client_Activity extends AppCompatActivity {
+public class Client_Activity extends AppCompatActivity implements OnMapReadyCallback {
 
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private TextView clientIdTextView, clientNameTextView, carTypeTextView, kilometersTextView, carModelTextView;
     private TextView noAppointmentTextView;
+    private TextView locationInfoTextView;
     private Button button_tor;
+    private SearchView searchView;
     private FirebaseFirestore db;
     private String clientId;
+    private GoogleMap mMap;
+    private FusedLocationProviderClient fusedLocationClient;
+    private Location currentLocation;
+    private Polyline currentRoute;
+    private Button navigateButton;
+    private LatLng startLocation; // Current location or searched location
+   
+    // המיקום המדויק של המוסך בטירה
+    private static final LatLng GARAGE_LOCATION = new LatLng(32.234986337467134, 34.96518895452847);
+    private static final String GARAGE_ADDRESS = "דרך אל סולטאני, טירה";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,15 +83,35 @@ public class Client_Activity extends AppCompatActivity {
 
         getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
 
+        // Initialize location services
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        
+        // Initialize views
         clientIdTextView = findViewById(R.id.clientIdTextView);
         clientNameTextView = findViewById(R.id.clientNameTextView);
         carModelTextView = findViewById(R.id.carModelTextView);
         kilometersTextView = findViewById(R.id.kilometersTextView);
         carTypeTextView = findViewById(R.id.carTypeTextView);
         noAppointmentTextView = findViewById(R.id.noAppointmentTextView);
+        locationInfoTextView = findViewById(R.id.locationInfoTextView);
         button_tor = findViewById(R.id.button_tor);
         ImageButton wrenchButton = findViewById(R.id.wrenchButton);
         ImageButton refreshButton = findViewById(R.id.refreshButton);
+        searchView = findViewById(R.id.searchView);
+        navigateButton = findViewById(R.id.navigateButton);
+
+        // Set up search functionality
+        setupSearchView();
+
+        // Set up navigation button
+        setupNavigateButton();
+
+        // Initialize map
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
 
         db = FirebaseFirestore.getInstance();
 
@@ -105,13 +162,212 @@ public class Client_Activity extends AppCompatActivity {
             torIntent.putExtra("clientId", clientId);
             startActivity(torIntent);
         });
+
+        // Request location permissions
+        requestLocationPermission();
+    }
+
+    private void setupSearchView() {
+        searchView.setQueryHint("חפש כתובת מוצא...");
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchLocation(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+
+    private void setupNavigateButton() {
+        navigateButton.setOnClickListener(v -> {
+            if (startLocation != null) {
+                // Navigate from current start location to garage
+                Uri gmmIntentUri = Uri.parse(String.format(Locale.US,
+                    "google.navigation:q=%f,%f",
+                    GARAGE_LOCATION.latitude,
+                    GARAGE_LOCATION.longitude));
+                
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                
+                if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(mapIntent);
+                } else {
+                    Toast.makeText(this, "אנא התקן את Google Maps", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "נקודת התחלה לא זמינה", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void searchLocation(String query) {
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocationName(query, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                LatLng searchedLocation = new LatLng(address.getLatitude(), address.getLongitude());
+                startLocation = searchedLocation; // Update start location
+                
+                // Clear previous markers and route
+                mMap.clear();
+                
+                // Add marker for searched location
+                mMap.addMarker(new MarkerOptions()
+                        .position(searchedLocation)
+                        .title("נקודת התחלה: " + query));
+                
+                // Add garage marker
+                addGarageMarker();
+                
+                // Draw route from searched location to garage
+                drawRoute(searchedLocation, GARAGE_LOCATION);
+                
+                // Update location info
+                updateLocationInfo(searchedLocation, query);
+            }
+        } catch (IOException e) {
+            Toast.makeText(this, "לא נמצאה כתובת", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void requestLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        } else {
+            getCurrentLocation();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                         @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getCurrentLocation();
+            }
+        }
+    }
+
+    private void getCurrentLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            Task<Location> locationTask = fusedLocationClient.getLastLocation();
+            locationTask.addOnSuccessListener(location -> {
+                if (location != null) {
+                    currentLocation = location;
+                    LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    startLocation = userLocation; // Set as start location
+                    
+                    if (mMap != null) {
+                        // Clear previous markers and route
+                        mMap.clear();
+                        
+                        // Add marker for user's location
+                        mMap.addMarker(new MarkerOptions()
+                                .position(userLocation)
+                                .title("המיקום שלי"));
+                        
+                        // Add garage marker
+                        addGarageMarker();
+                        
+                        // Draw route to garage
+                        drawRoute(userLocation, GARAGE_LOCATION);
+                        
+                        // Update location info
+                        updateLocationInfo(userLocation, "המיקום הנוכחי שלי");
+                    }
+                }
+            });
+        }
+    }
+
+    private void drawRoute(LatLng origin, LatLng destination) {
+        // Remove previous route if exists
+        if (currentRoute != null) {
+            currentRoute.remove();
+        }
+
+        // Draw new route
+        PolylineOptions polylineOptions = new PolylineOptions()
+                .add(origin)
+                .add(destination)
+                .width(5)
+                .color(Color.BLUE);
+        
+        currentRoute = mMap.addPolyline(polylineOptions);
+        
+        // Adjust camera to show entire route
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        builder.include(origin);
+        builder.include(destination);
+        LatLngBounds bounds = builder.build();
+        
+        // Add padding to the bounds
+        int padding = 100;
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+    }
+
+    private void updateLocationInfo(LatLng location, String addressName) {
+        String locationInfo = String.format(Locale.getDefault(),
+                "נקודת התחלה: %s\n" +
+                "קו רוחב: %.6f\n" +
+                "קו אורך: %.6f\n" +
+                "\nיעד - המוסך שלנו:\n" +
+                "קו רוחב: %.6f\n" +
+                "קו אורך: %.6f",
+                addressName,
+                location.latitude,
+                location.longitude,
+                GARAGE_LOCATION.latitude,
+                GARAGE_LOCATION.longitude
+        );
+        locationInfoTextView.setText(locationInfo);
+    }
+
+    private void addGarageMarker() {
+        mMap.addMarker(new MarkerOptions()
+                .position(GARAGE_LOCATION)
+                .title("המוסך שלנו")
+                .snippet(GARAGE_ADDRESS));
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        
+        // Enable my location button
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        }
+        
+        // Set up map UI
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
+        
+        // Add garage marker
+        addGarageMarker();
+        
+        // Get current location
+        getCurrentLocation();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (clientId != null && !clientId.isEmpty()) {
-            checkAppointment(clientId); // ריענון נתוני תור
+            checkAppointment(clientId);
         }
     }
 
