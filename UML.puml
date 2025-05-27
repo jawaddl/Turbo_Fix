@@ -1,0 +1,592 @@
+@startuml
+class com.example.turbo_fix.Admin_Activity {
+- RecyclerView recyclerView
+- SwipeRefreshLayout swipeRefresh
+- View emptyStateLayout
+- ChipGroup filterChipGroup
+- FirebaseFirestore db
+- AppointmentsAdapter adapter
+- List<AppointmentItem> appointments
+- FirebaseStorage storage
+# void onCreate(Bundle)
+- void showBlockHoursDialog()
+- void blockEntireDay(Date)
+- void blockSpecificHour(Date,String)
+- boolean isAdmin()
+- void deleteExpiredAppointments()
+- void loadAppointments()
+- Date getEndOfDay(Date)
+- void updateUI()
+- void showAppointmentDetails(AppointmentItem)
+- void deleteAppointment(AppointmentItem)
+}
+
+
+class com.example.turbo_fix.Admin_Activity$AppointmentItem {
+~ String userId
+~ String appointmentId
+~ String clientName
+~ Date date
+~ String description
+~ Boolean knowsProblem
+~ long timezoneOffset
+}
+
+class com.example.turbo_fix.Admin_Activity$AppointmentsAdapter {
++ ViewHolder onCreateViewHolder(ViewGroup,int)
++ void onBindViewHolder(ViewHolder,int)
++ int getItemCount()
+}
+
+class com.example.turbo_fix.Admin_Activity$AppointmentsAdapter$ViewHolder {
+~ TextView clientNameText
+~ TextView clientIdText
+~ TextView appointmentDateText
+~ TextView problemDescriptionText
+~ ImageButton deleteButton
+~ View viewDetailsButton
+~ <<Create>> ViewHolder(View)
+}
+
+
+class com.example.turbo_fix.databinding.DialogFullscreenImageBinding {
+- RelativeLayout rootView
++ ImageView fullscreenImage
++ ProgressBar loadingIndicator
+- <<Create>> DialogFullscreenImageBinding(RelativeLayout,ImageView,ProgressBar)
++ RelativeLayout getRoot()
++ {static} DialogFullscreenImageBinding inflate(LayoutInflater)
++ {static} DialogFullscreenImageBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} DialogFullscreenImageBinding bind(View)
+}
+
+
+class com.example.turbo_fix.databinding.ActivityClientBinding {
+- ScrollView rootView
++ FrameLayout appointmentFragmentContainer
++ Button buttonTor
++ TextView carModelTextView
++ TextView carTypeTextView
++ TextView clientIdTextView
++ TextView clientNameTextView
++ TextView kilometersTextView
++ TextView locationInfoTextView
++ MapView map
++ Button navigateButton
++ SearchView searchView
++ ImageButton wrenchButton
+- <<Create>> ActivityClientBinding(ScrollView,FrameLayout,Button,TextView,TextView,TextView,TextView,TextView,TextView,MapView,Button,SearchView,ImageButton)
++ ScrollView getRoot()
++ {static} ActivityClientBinding inflate(LayoutInflater)
++ {static} ActivityClientBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ActivityClientBinding bind(View)
+}
+
+
+class com.example.turbo_fix.Select_admin {
+# void onCreate(Bundle)
+}
+
+class com.example.turbo_fix.databinding.DialogAppointmentDetailsBinding {
+- ScrollView rootView
++ TextView clientIdText
++ TextView clientNameText
++ ImageButton copyButton
++ TextView dateText
++ TextView descriptionText
++ LinearLayout imagesContainer
++ ProgressBar loadingProgress
++ TextView problemTypeText
++ TextView timeText
+- <<Create>> DialogAppointmentDetailsBinding(ScrollView,TextView,TextView,ImageButton,TextView,TextView,LinearLayout,ProgressBar,TextView,TextView)
++ ScrollView getRoot()
++ {static} DialogAppointmentDetailsBinding inflate(LayoutInflater)
++ {static} DialogAppointmentDetailsBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} DialogAppointmentDetailsBinding bind(View)
+}
+
+
+class com.example.turbo_fix.ExampleUnitTest {
++ void addition_isCorrect()
+}
+note top of com.example.turbo_fix.ExampleUnitTest
+
+ * Example local unit test, which will execute on the development machine (host).
+ *
+ * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+ 
+end note
+
+
+class com.example.turbo_fix.AppointmentDetailsFragment {
+- TextView appointmentStatusTextView
+- Date appointmentDate
+- String appointmentStatus
++ {static} AppointmentDetailsFragment newInstance(Date,String)
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+- void updateAppointmentDisplay()
++ void updateAppointmentInfo(Date,String)
+}
+
+
+class com.example.turbo_fix.databinding.SpinnerItemBinding {
+- TextView rootView
+- <<Create>> SpinnerItemBinding(TextView)
++ TextView getRoot()
++ {static} SpinnerItemBinding inflate(LayoutInflater)
++ {static} SpinnerItemBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} SpinnerItemBinding bind(View)
+}
+
+
+class com.example.turbo_fix.Make_An_appointment {
+~ EditText symptomsEditText
+~ Button uploadImageButton
+~ LinearLayout imageContainer
+~ RadioGroup radioGroup
+~ RadioButton radioYes
+~ TextView welcomeTextView
+~ List<Uri> imageUris
+~ FirebaseFirestore db
+~ FirebaseStorage storage
+~ ActivityResultLauncher<Intent> galleryLauncher
+~ boolean knowsProblem
+~ String clientId
+~ String fullName
+~ Calendar selectedDate
+# void onCreate(Bundle)
+- void openDatePicker()
+- void openTimePicker(Calendar)
+- void openGallery()
+- void addThumbnail(Uri)
+- int dpToPx(int)
+- void checkDateAvailability(String)
+- void uploadAppointmentToFirebase(String)
+}
+
+
+class com.example.turbo_fix.databinding.ActivitySelectAdminBinding {
+- CoordinatorLayout rootView
++ AppBarLayout appBarLayout
++ MaterialCardView btnAdminActivity
++ MaterialCardView btnCustomerInfo
++ CoordinatorLayout main
++ MaterialToolbar topAppBar
+- <<Create>> ActivitySelectAdminBinding(CoordinatorLayout,AppBarLayout,MaterialCardView,MaterialCardView,CoordinatorLayout,MaterialToolbar)
++ CoordinatorLayout getRoot()
++ {static} ActivitySelectAdminBinding inflate(LayoutInflater)
++ {static} ActivitySelectAdminBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ActivitySelectAdminBinding bind(View)
+}
+
+
+class com.example.turbo_fix.databinding.ActivityRegistrationBinding {
+- ScrollView rootView
++ EditText email
++ EditText emailPassword
++ EditText fullName
++ EditText licensePlate
++ EditText phoneNumber
++ Button submitButton
++ LinearLayout vehicleFields
+- <<Create>> ActivityRegistrationBinding(ScrollView,EditText,EditText,EditText,EditText,EditText,Button,LinearLayout)
++ ScrollView getRoot()
++ {static} ActivityRegistrationBinding inflate(LayoutInflater)
++ {static} ActivityRegistrationBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ActivityRegistrationBinding bind(View)
+}
+
+
+class com.example.turbo_fix.databinding.RegistrationScreenBinding {
+- ScrollView rootView
++ EditText email
++ EditText emailPassword
++ EditText fullName
++ EditText loginPassword
++ EditText phoneNumber
++ Button submitButton
++ Spinner vehicleCountSpinner
++ LinearLayout vehicleFields
+- <<Create>> RegistrationScreenBinding(ScrollView,EditText,EditText,EditText,EditText,EditText,Button,Spinner,LinearLayout)
++ ScrollView getRoot()
++ {static} RegistrationScreenBinding inflate(LayoutInflater)
++ {static} RegistrationScreenBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} RegistrationScreenBinding bind(View)
+}
+
+
+class com.example.turbo_fix.MainActivity {
+- FirebaseFirestore firestore
+- EditText emailEditText
+- Button loginButton
+# void onCreate(Bundle)
+- void loginUser()
+}
+
+
+class com.example.turbo_fix.databinding.DialogBlockHoursBinding {
+- LinearLayout rootView
++ CheckBox allDayCheckBox
++ CalendarView calendarView
++ ListView hourListView
+- <<Create>> DialogBlockHoursBinding(LinearLayout,CheckBox,CalendarView,ListView)
++ LinearLayout getRoot()
++ {static} DialogBlockHoursBinding inflate(LayoutInflater)
++ {static} DialogBlockHoursBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} DialogBlockHoursBinding bind(View)
+}
+
+
+class com.example.turbo_fix.databinding.ActivityMakeAnAppointmentBinding {
+- FrameLayout rootView
++ TextView IntroductionQuestion
++ Button backButton
++ LinearLayout imageContainer
++ Button nextBtn
++ EditText problemDetailsEditText
++ RadioGroup radioGroup
++ RadioButton radioNo
++ RadioButton radioYes
++ Button selectDateButton
++ TextView selectedDateTextView
++ EditText symptomsEditText
++ Button uploadImageButton
++ TextView welcomeTextView
+- <<Create>> ActivityMakeAnAppointmentBinding(FrameLayout,TextView,Button,LinearLayout,Button,EditText,RadioGroup,RadioButton,RadioButton,Button,TextView,EditText,Button,TextView)
++ FrameLayout getRoot()
++ {static} ActivityMakeAnAppointmentBinding inflate(LayoutInflater)
++ {static} ActivityMakeAnAppointmentBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ActivityMakeAnAppointmentBinding bind(View)
+}
+
+
+class com.example.turbo_fix.databinding.ItemAppointmentBinding {
+- MaterialCardView rootView
++ TextView appointmentDateText
++ TextView clientIdText
++ TextView clientNameText
++ ImageButton deleteButton
++ TextView problemDescriptionText
++ MaterialButton viewDetailsButton
+- <<Create>> ItemAppointmentBinding(MaterialCardView,TextView,TextView,TextView,ImageButton,TextView,MaterialButton)
++ MaterialCardView getRoot()
++ {static} ItemAppointmentBinding inflate(LayoutInflater)
++ {static} ItemAppointmentBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ItemAppointmentBinding bind(View)
+}
+
+
+class com.example.turbo_fix.databinding.ActivityServiceSelectionBinding {
+- FrameLayout rootView
++ Button backToClientBtn
++ Button scheduleAppointmentBtn
++ Button urgentCallBtn
+- <<Create>> ActivityServiceSelectionBinding(FrameLayout,Button,Button,Button)
++ FrameLayout getRoot()
++ {static} ActivityServiceSelectionBinding inflate(LayoutInflater)
++ {static} ActivityServiceSelectionBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ActivityServiceSelectionBinding bind(View)
+}
+
+
+class com.example.turbo_fix.User {
+- String fullName
+- String email
+- String password
+- String phoneNumber
+- String licensePlate
++ <<Create>> User(String,String,String,String,String)
++ String getFullName()
++ void setFullName(String)
++ String getEmail()
++ void setEmail(String)
++ String getPassword()
++ void setPassword(String)
++ String getPhoneNumber()
++ void setPhoneNumber(String)
++ String getLicensePlate()
++ void setLicensePlate(String)
+}
+
+note left of com.example.turbo_fix.User::User(String,String,String,String,String)
+ בנאי
+end note
+note right of com.example.turbo_fix.User::getFullName()
+ Getters ו-Setters
+end note
+
+class com.example.turbo_fix.databinding.DialogLayoutBinding {
+- LinearLayout rootView
++ ImageView closeButton
++ ImageView fullScreenImageView
+- <<Create>> DialogLayoutBinding(LinearLayout,ImageView,ImageView)
++ LinearLayout getRoot()
++ {static} DialogLayoutBinding inflate(LayoutInflater)
++ {static} DialogLayoutBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} DialogLayoutBinding bind(View)
+}
+
+
+class com.example.turbo_fix.HashUtil {
++ {static} String generateShortHash(String)
+}
+note left of com.example.turbo_fix.HashUtil::generateShortHash(String)
+ פונקציה ליצירת hash ממחרוזת
+end note
+
+class com.example.turbo_fix.databinding.FragmentAppointmentDetailsBinding {
+- CardView rootView
++ TextView appointmentStatusTextView
+- <<Create>> FragmentAppointmentDetailsBinding(CardView,TextView)
++ CardView getRoot()
++ {static} FragmentAppointmentDetailsBinding inflate(LayoutInflater)
++ {static} FragmentAppointmentDetailsBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} FragmentAppointmentDetailsBinding bind(View)
+}
+
+
+class com.example.turbo_fix.Registration2 {
+- EditText mileage
+- Spinner serviceLevelSpinner
+- Button uploadImageButton
+- List<Uri> imageUris
+- FirebaseFirestore db
+- FirebaseStorage storage
+- StorageReference storageRef
+- ActivityResultLauncher<Intent> imagePickerLauncher
+# void onCreate(Bundle)
+- void openImagePicker()
+- void uploadImagesToFirebase(List<Uri>,Map<String,Object>)
+- void saveUserToFirestore(Map<String,Object>,String)
+- void showToast(String)
+}
+note left of com.example.turbo_fix.Registration2::imagePickerLauncher
+ תוצאה מהפתיחה של גלריית התמונות
+end note
+
+note left of com.example.turbo_fix.Registration2::openImagePicker()
+ פתיחת אלבום התמונות
+end note
+note right of com.example.turbo_fix.Registration2::uploadImagesToFirebase(List<Uri>,Map<String,Object>)
+ העלאת התמונות ל-Firebase Storage
+end note
+note left of com.example.turbo_fix.Registration2::saveUserToFirestore(Map<String,Object>,String)
+ שמירת נתוני המשתמש ב-Firestore
+end note
+note right of com.example.turbo_fix.Registration2::showToast(String)
+ הצגת הודעות טוסט
+end note
+
+class com.example.turbo_fix.CustomerIIIInfo {
+- EditText searchEditText
+- Button searchButton
+- TextView resultTextView
+- LinearLayout imageContainer
+- Button backButton
+- {static} String TAG
+# void onCreate(Bundle)
+- void displayImages(List<String>)
+- void showFullScreenImage(String)
+- int dpToPx(int)
+}
+note left of com.example.turbo_fix.CustomerIIIInfo::backButton
+ כפתור חזרה
+end note
+
+
+class com.example.turbo_fix.CustomerIIIInfo$FetchVehicleDataTask {
+# String doInBackground(String)
+# void onPostExecute(String)
+}
+
+class com.example.turbo_fix.Client_Activity {
+- {static} int LOCATION_PERMISSION_REQUEST_CODE
+- TextView clientIdTextView
+- TextView noAppointmentTextView
+- TextView locationInfoTextView
+- Button button_tor
+- SearchView searchView
+- FirebaseFirestore db
+- String clientId
+- GoogleMap mMap
+- MapView mapView
+- FusedLocationProviderClient fusedLocationClient
+- Location currentLocation
+- Polyline currentRoute
+- Button navigateButton
+- LatLng startLocation
+- {static} LatLng GARAGE_LOCATION
+- {static} String GARAGE_ADDRESS
+- LatLng tempLocation
+- LatLng tempSearchLocation
+- AppointmentDetailsFragment appointmentFragment
+# void onCreate(Bundle)
+- void setupSearchView()
+- void setupNavigateButton()
+- void searchLocation(String)
+- void requestLocationPermission()
++ void onRequestPermissionsResult(int,String[],int[])
+- void getCurrentLocation()
+- void drawRoute(LatLng,LatLng)
+- void updateLocationInfo(LatLng,String)
+- void addGarageMarker()
++ void onMapReady(GoogleMap)
+# void onResume()
+# void onPause()
+# void onDestroy()
++ void onLowMemory()
+# void onSaveInstanceState(Bundle)
+- void fetchClientData(String)
+- void checkAppointment(String)
+- void setStyledText(TextView,String,String)
+- void showUpdateDialog(String,String,int)
+- void updateFieldInFirestore(String,String)
+}
+note left of com.example.turbo_fix.Client_Activity::startLocation
+ Current location or searched location
+end note
+note right of com.example.turbo_fix.Client_Activity::GARAGE_LOCATION
+ המיקום המדויק של המוסך בטירה
+end note
+note left of com.example.turbo_fix.Client_Activity::tempLocation
+ Store temporary searched location
+end note
+note right of com.example.turbo_fix.Client_Activity::tempSearchLocation
+ Store the searched location temporarily
+end note
+
+
+class com.example.turbo_fix.databinding.ActivityAdminBinding {
+- CoordinatorLayout rootView
++ RecyclerView appointmentsRecyclerView
++ ImageButton backButton
++ MaterialButton blockHoursButton
++ Chip chipAll
++ Chip chipToday
++ Chip chipTomorrow
++ LinearLayout emptyStateLayout
++ ChipGroup filterChipGroup
++ SwipeRefreshLayout swipeRefresh
++ Toolbar toolbar
+- <<Create>> ActivityAdminBinding(CoordinatorLayout,RecyclerView,ImageButton,MaterialButton,Chip,Chip,Chip,LinearLayout,ChipGroup,SwipeRefreshLayout,Toolbar)
++ CoordinatorLayout getRoot()
++ {static} ActivityAdminBinding inflate(LayoutInflater)
++ {static} ActivityAdminBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ActivityAdminBinding bind(View)
+}
+
+
+class com.example.turbo_fix.databinding.CustomeriiiinfoBinding {
+- FrameLayout rootView
++ Button backButton
++ LinearLayout imageContainer
++ TextView resultTextView
++ Button searchButton
++ TextInputEditText searchEditText
+- <<Create>> CustomeriiiinfoBinding(FrameLayout,Button,LinearLayout,TextView,Button,TextInputEditText)
++ FrameLayout getRoot()
++ {static} CustomeriiiinfoBinding inflate(LayoutInflater)
++ {static} CustomeriiiinfoBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} CustomeriiiinfoBinding bind(View)
+}
+
+
+class com.example.turbo_fix.Service_selection {
+~ Button scheduleAppointmentBtn
+~ String clientId
+# void onCreate(Bundle)
+}
+
+
+class com.example.turbo_fix.Registration {
+# void onCreate(Bundle)
+- void showToast(String)
+}
+
+class com.example.turbo_fix.databinding.ActivityMainBinding {
+- ConstraintLayout rootView
++ TextView appNameText
++ LinearLayout carPartsSection
++ EditText emailEditText
++ Button loginButton
++ EditText passwordEditText
++ Button registerButton
++ TextView titleText
++ ImageView turboIconLeft
++ ImageView turboIconRight
+- <<Create>> ActivityMainBinding(ConstraintLayout,TextView,LinearLayout,EditText,Button,EditText,Button,TextView,ImageView,ImageView)
++ ConstraintLayout getRoot()
++ {static} ActivityMainBinding inflate(LayoutInflater)
++ {static} ActivityMainBinding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ActivityMainBinding bind(View)
+}
+
+
+class com.example.turbo_fix.databinding.ActivityRegistration2Binding {
+- ScrollView rootView
++ EditText accidentDetails
++ Spinner accidentSpinner
++ ImageView imageView
++ EditText mileage
++ Spinner serviceLevelSpinner
++ Button submitButton
++ Button uploadImageButton
+- <<Create>> ActivityRegistration2Binding(ScrollView,EditText,Spinner,ImageView,EditText,Spinner,Button,Button)
++ ScrollView getRoot()
++ {static} ActivityRegistration2Binding inflate(LayoutInflater)
++ {static} ActivityRegistration2Binding inflate(LayoutInflater,ViewGroup,boolean)
++ {static} ActivityRegistration2Binding bind(View)
+}
+
+
+class com.example.turbo_fix.ExampleInstrumentedTest {
++ void useAppContext()
+}
+note top of com.example.turbo_fix.ExampleInstrumentedTest
+
+ * Instrumented test, which will execute on an Android device.
+ *
+ * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+ 
+end note
+
+
+
+
+androidx.appcompat.app.AppCompatActivity <|-- com.example.turbo_fix.Admin_Activity
+com.example.turbo_fix.Admin_Activity +.. com.example.turbo_fix.Admin_Activity$AppointmentItem
+com.example.turbo_fix.Admin_Activity +.. com.example.turbo_fix.Admin_Activity$AppointmentsAdapter
+com.example.turbo_fix.Adapter <|-- com.example.turbo_fix.Admin_Activity$AppointmentsAdapter
+com.example.turbo_fix.Admin_Activity$AppointmentsAdapter +.. com.example.turbo_fix.Admin_Activity$AppointmentsAdapter$ViewHolder
+com.example.turbo_fix.ViewHolder <|-- com.example.turbo_fix.Admin_Activity$AppointmentsAdapter$ViewHolder
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.DialogFullscreenImageBinding
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.ActivityClientBinding
+androidx.appcompat.app.AppCompatActivity <|-- com.example.turbo_fix.Select_admin
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.DialogAppointmentDetailsBinding
+androidx.fragment.app.Fragment <|-- com.example.turbo_fix.AppointmentDetailsFragment
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.SpinnerItemBinding
+androidx.appcompat.app.AppCompatActivity <|-- com.example.turbo_fix.Make_An_appointment
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.ActivitySelectAdminBinding
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.ActivityRegistrationBinding
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.RegistrationScreenBinding
+androidx.appcompat.app.AppCompatActivity <|-- com.example.turbo_fix.MainActivity
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.DialogBlockHoursBinding
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.ActivityMakeAnAppointmentBinding
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.ItemAppointmentBinding
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.ActivityServiceSelectionBinding
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.DialogLayoutBinding
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.FragmentAppointmentDetailsBinding
+androidx.appcompat.app.AppCompatActivity <|-- com.example.turbo_fix.Registration2
+androidx.appcompat.app.AppCompatActivity <|-- com.example.turbo_fix.CustomerIIIInfo
+com.example.turbo_fix.CustomerIIIInfo +.. com.example.turbo_fix.CustomerIIIInfo$FetchVehicleDataTask
+com.example.turbo_fix.AsyncTask <|-- com.example.turbo_fix.CustomerIIIInfo$FetchVehicleDataTask
+com.google.android.gms.maps.OnMapReadyCallback <|.. com.example.turbo_fix.Client_Activity
+androidx.appcompat.app.AppCompatActivity <|-- com.example.turbo_fix.Client_Activity
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.ActivityAdminBinding
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.CustomeriiiinfoBinding
+androidx.appcompat.app.AppCompatActivity <|-- com.example.turbo_fix.Service_selection
+androidx.appcompat.app.AppCompatActivity <|-- com.example.turbo_fix.Registration
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.ActivityMainBinding
+androidx.viewbinding.ViewBinding <|.. com.example.turbo_fix.databinding.ActivityRegistration2Binding
+@enduml
